@@ -13,15 +13,11 @@ typedef enum {
 } ListingCommandType;
 
 typedef struct {
-    char *name,
-    char *doc,
-    int (*parse)(Listing *, char *input)
-} Command;
-
-typedef struct {
     ProductCatalog *catalog;
     ProductEntry *head;
     CategoryFilter filter;
+
+    // more stuff
 } ListingState;
 
 void displayListing(ListingState *state) {
