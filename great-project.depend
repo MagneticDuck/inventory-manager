@@ -1,0 +1,39 @@
+# depslib dependency file v1.0
+1515268529 source:/home/magneticduck/git/great-project/test/test.c
+	"tinytest.h"
+	"util.h"
+	"algorithms/ordered_list.h"
+
+1514985137 /home/magneticduck/git/great-project/test/tinytest.h
+	<stdio.h>
+	<stdlib.h>
+
+1515268284 /home/magneticduck/git/great-project/include/util.h
+	<stdio.h>
+	<stddef.h>
+	<stdlib.h>
+	<stdbool.h>
+
+1515166783 /home/magneticduck/git/great-project/include/algorithms/ordered_list.h
+
+1515268388 source:/home/magneticduck/git/great-project/src/data.c
+	"data.h"
+
+1515260373 /home/magneticduck/git/great-project/include/data.h
+	<stdio.h>
+	"util.h"
+
+1515279187 source:/home/magneticduck/git/great-project/src/algorithms/ordered_list.c
+	"util.h"
+	"algorithms/ordered_list.h"
+
+1515165904 source:/home/magneticduck/git/great-project/src/util.c
+	"util.h"
+
+1515147007 source:/home/magneticduck/git/great-project/src/catalog.c
+	"catalog.h"
+
+1515268295 /home/magneticduck/git/great-project/include/catalog.h
+	<stdio.h>
+	"data.h"
+
