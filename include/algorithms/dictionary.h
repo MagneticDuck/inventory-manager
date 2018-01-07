@@ -14,7 +14,7 @@ DictEntry * dictLookup(Dictionary *, char * key);
 DictEntry * dictAdd(Dictionary *, char * key, void * value); // Returns NULL if key is already in dictionary.
 void dictRemove(Dictionary *, DictEntry *);
 
-char * dictKey(DictEntry *);
-void * dictValue(DictEntry *);
+void ** dictValue(DictEntry *);
+char * dictKey(DictEntry *); // Do not edit!
 
 #endif // DICTIONARY_H_INCLUDED

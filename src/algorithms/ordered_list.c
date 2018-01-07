@@ -37,6 +37,7 @@ OLNode * olFirst(OrderedList * list) {
 OLNode * olSupremum(OrderedList * list, void * key) {
     OLNode * current = list->first;
     loop {
+        if (current) printf("trying %s...\n", (char *) current->key);
         if(!current || (*list->ordering)(key, current->key)) return current;
         current = current->next;
     }
@@ -59,13 +60,6 @@ OLNode * olPrev(OLNode * node) {
     return node->prev;
 }
 
-void * olValue(OLNode * node) {
-    return node->value;
-}
-
-void * olKey(OLNode * node) {
-    return node->key;
-}
 
 size_t olIndex(OLNode * node) {
     size_t i = -1;
@@ -115,6 +109,14 @@ void olRemove(OrderedList *list, OLNode * node) {
     if (node->next) node->next->prev = node->prev;
     else list->last = node->prev;
     free(node);
+}
+
+void ** olValue(OLNode * node) {
+    return &node->value;
+}
+
+void * olKey(OLNode * node) {
+    return node->key;
 }
 
 #else

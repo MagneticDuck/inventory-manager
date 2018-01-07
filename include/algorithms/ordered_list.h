@@ -21,8 +21,8 @@ OLNode * olSeekBy(OrderedList *, size_t seek);
 OLNode * olNext(OLNode *);
 OLNode * olPrev(OLNode *);
 
-void * olValue(OLNode *);
-void * olKey(OLNode *);
+void ** olValue(OLNode *);
+void * olKey(OLNode *); // Do not edit!
 size_t olIndex(OLNode *);
 
 OLNode * olAdd(OrderedList *, void * key, void * value);

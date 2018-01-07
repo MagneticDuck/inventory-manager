@@ -36,13 +36,16 @@ void freeDictionary(Dictionary * dictionary) {
 
 DictionaryEntry * dictLookup(Dictionary * dictionary, char * key) {
     OLNode * closest = olSupremum(dictionary->list, key);
-    if (strcmp((char *) olKey(closest), key)) return olValue(closest);
+    printf("key is %s\n", (char *) olKey(closest));
+    if (0 == strcmp((char *) olKey(closest), key)) return *olValue(closest);
     return NULL;
 }
 
 DictionaryEntry * dictAdd(Dictionary * dictionary, char * key, void * value) {
+    OLNode * newNode = olAddWithoutDuplication(dictionary->list, key, NULL);
+    if (!newNode) return NULL;
     DictionaryEntry * entry = malloc(sizeof(DictionaryEntry));
-    OLNode * newNode = olAddWithoutDuplication(dictionary->list, key, entry);
+    *olValue(newNode) = entry;
     entry->value = value;
     entry->node = newNode;
     return entry;
@@ -57,8 +60,8 @@ char * dictKey(DictionaryEntry * entry) {
     return olKey(entry->node);
 }
 
-void * dictValue(DictionaryEntry * entry) {
-    return entry->value;
+void ** dictValue(DictionaryEntry * entry) {
+    return &entry->value;
 }
 
 #else
