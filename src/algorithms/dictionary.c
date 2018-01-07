@@ -36,8 +36,7 @@ void freeDictionary(Dictionary * dictionary) {
 
 DictionaryEntry * dictLookup(Dictionary * dictionary, char * key) {
     OLNode * closest = olSupremum(dictionary->list, key);
-    printf("key is %s\n", (char *) olKey(closest));
-    if (0 == strcmp((char *) olKey(closest), key)) return *olValue(closest);
+    if (closest && 0 == strcmp((char *) olKey(closest), key)) return *olValue(closest);
     return NULL;
 }
 

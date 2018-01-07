@@ -37,7 +37,6 @@ OLNode * olFirst(OrderedList * list) {
 OLNode * olSupremum(OrderedList * list, void * key) {
     OLNode * current = list->first;
     loop {
-        if (current) printf("trying %s...\n", (char *) current->key);
         if(!current || (*list->ordering)(key, current->key)) return current;
         current = current->next;
     }
@@ -94,8 +93,7 @@ OLNode * olAdd(OrderedList * list, void * key, void * value) {
 
 OLNode * olAddWithoutDuplication(OrderedList * list, void * key, void * value) {
     OLNode * successor = olSupremum(list, key);
-    if (successor && strcmp(successor->key, key)) return NULL;
-
+    if (successor && strcmp(successor->key, key) == 0) return NULL;
     OLNode * newNode = malloc(sizeof(OLNode));
     newNode->key = key;
     newNode->value = value;

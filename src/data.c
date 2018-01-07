@@ -5,6 +5,7 @@ ReadStatus loadFlatfile(
     bool (*onCategory)(Category *, void *),
     bool (*onRecord)(ProductRecord *, void *)) {
     FILE * file = fopen(filepath, "r");
+    // TODO
 }
 
 ReadStatus loadDemoFlatfile(
@@ -19,5 +20,8 @@ ReadStatus loadDemoFlatfile(
     }
     for (size_t i = 0; i <= 10000; ++i) {
         ProductRecord *record = malloc(sizeof(ProductRecord));
+        // stuff
+        onDefRecord(catcher, record);
     }
+    return READ_OK;
 }

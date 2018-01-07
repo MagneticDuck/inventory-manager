@@ -27,6 +27,7 @@ size_t olIndex(OLNode *);
 
 OLNode * olAdd(OrderedList *, void * key, void * value);
 OLNode * olAddWithoutDuplication(OrderedList *, void * key, void * value); // Refuse to add if the key is already used.
+void olReindex(OrderedList *, OLNode *, void * newKey);
 void olRemove(OrderedList *, OLNode *);
 
 #endif // ORDERED_LIST_H_INCLUDED
