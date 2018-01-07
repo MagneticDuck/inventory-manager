@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include "util.h"
 
-typedef char *Filepath;
+typedef char * Filepath;
 #define PRODUCT_ID_LENGTH 20
 #define MAX_STRING_LENGTH 100
 
@@ -22,7 +22,7 @@ typedef struct {
 typedef struct {
     char name[MAX_STRING_LENGTH];
     Price price;
-    Category *category;
+    Category * category;
     unsigned int instances;
 } ProductRecord;
 
@@ -35,15 +35,17 @@ typedef enum {
     READ_BAD_SANITIZE // The parsed information can't be cataloged.
 } ReadStatus;
 
+// These methods have the responsibility of allocating the memory for Category and ProductRecord.
+// Of course, the responsibility of cleaning up falls on Catalog.
 ReadStatus loadFlatfile(
-    Filepath filepath, void *reader,
-    bool (*onDefCategory)(Category const*, void *),
-    bool (*onDefRecord)(ProductRecord const*, void *));
+    Filepath filepath, void * reader,
+    bool (*onDefCategory)(Category *, void *),
+    bool (*onDefRecord)(ProductRecord *, void *));
 
 ReadStatus loadDemoFlatfile(
-    void *catcher,
-    bool (*onDefCategory)(Category const*, void *),
-    bool (*onDefRecord)(ProductRecord const*, void *));
+    void * catcher,
+    bool (*onDefCategory)(Category *, void *),
+    bool (*onDefRecord)(ProductRecord *, void *));
 
 typedef enum {
     WRITE_OK = 0,
@@ -51,9 +53,9 @@ typedef enum {
 } WriteStatus;
 
 WriteStatus writeFlatfile(
-    Filepath filepath, void *write,
-    Category *(popCategory)(),
-    ProductRecord *(popRecord)());
+    Filepath filepath, void * write,
+    Category * (popCategory)(),
+    ProductRecord * (popRecord)());
 
 WriteStatus writeDemoFlatfile(Filepath filepath);
 

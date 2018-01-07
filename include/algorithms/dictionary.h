@@ -1,16 +1,20 @@
 /**
- * Abstract dictionary type. Stores key-value pairs and permits fast searching by keys. A hashmap is used internally, relying on a supplied
- * hashing function to bin keys.
+ * Abstract dictionary type storing key-value pairs. Value agnostic, but specialized for string keys.
  */
 #ifndef DICTIONARY_H_INCLUDED
 #define DICTIONARY_H_INCLUDED
 
-typedef bool (*OrderingFunction)(void *, void *);
+typedef struct Dictionary Dictionary;
+typedef struct DictionaryEntry DictEntry;
 
-typedef struct Dictionary;
-typedef struct DictionaryEntry;
-
-Dictionary *newDictionary();
+Dictionary * newDictionary();
 void freeDictionary(Dictionary *);
+
+DictEntry * dictLookup(Dictionary *, char * key);
+DictEntry * dictAdd(Dictionary *, char * key, void * value); // Returns NULL if key is already in dictionary.
+void dictRemove(Dictionary *, DictEntry *);
+
+char * dictKey(DictEntry *);
+void * dictValue(DictEntry *);
 
 #endif // DICTIONARY_H_INCLUDED

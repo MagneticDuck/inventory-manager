@@ -8,3 +8,7 @@ bool lexiographicCompare(void * ptrA, void * ptrB) {
         if(strA[i] != strB[i]) return strA[i] <= strB[i];
     }
 }
+
+void getRandomName(char name[]) {
+
+}

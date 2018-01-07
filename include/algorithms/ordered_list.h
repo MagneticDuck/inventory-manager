@@ -5,7 +5,9 @@
 #ifndef ORDERED_LIST_H_INCLUDED
 #define ORDERED_LIST_H_INCLUDED
 
-typedef bool (*OrderingFunction)(void *, void *);
+#include "util.h"
+
+typedef bool (* OrderingFunction)(void *, void *);
 
 typedef struct OrderedList OrderedList;
 typedef struct OLNode OLNode;
@@ -24,6 +26,7 @@ void * olKey(OLNode *);
 size_t olIndex(OLNode *);
 
 OLNode * olAdd(OrderedList *, void * key, void * value);
-void olRemove(OLNode *);
+OLNode * olAddWithoutDuplication(OrderedList *, void * key, void * value); // Refuse to add if the key is already used.
+void olRemove(OrderedList *, OLNode *);
 
 #endif // ORDERED_LIST_H_INCLUDED

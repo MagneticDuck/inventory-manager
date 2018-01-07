@@ -1,8 +1,12 @@
+// This is a compile-time option, not a cpp guard.
+#define SIMPLE_ORDERED_LIST
+#ifdef SIMPLE_ORDERED_LIST
+
 #include "util.h"
 #include "algorithms/ordered_list.h"
 
-#define SIMPLE_LIST
-#ifdef SIMPLE_LIST
+// When SIMPLE_ORDERED_LIST is enabled, we just use a linked list.
+
 struct OrderedList {
     OrderingFunction ordering;
     OLNode * first, * last;
@@ -22,7 +26,7 @@ OrderedList * newOrderedList(OrderingFunction ordering) {
 }
 
 void freeOrderedList(OrderedList * list) {
-    while (list->first) olRemove(list->first);
+    while(list->first) olRemove(list, list->first);
     free(list);
 }
 
@@ -33,14 +37,14 @@ OLNode * olFirst(OrderedList * list) {
 OLNode * olSupremum(OrderedList * list, void * key) {
     OLNode * current = list->first;
     loop {
-        if (!current || (*list->ordering)(key, current->key)) return current;
+        if(!current || (*list->ordering)(key, current->key)) return current;
         current = current->next;
     }
 }
 
 OLNode * olSeekBy(OrderedList * list, size_t seek) {
     OLNode * current = list->first;
-    while (seek > 0 && current) {
+    while(seek > 0 && current) {
         current = current->next;
         --seek;
     }
@@ -65,20 +69,17 @@ void * olKey(OLNode * node) {
 
 size_t olIndex(OLNode * node) {
     size_t i = -1;
-    for (OLNode * current = node; current; current = current->prev) ++i;
+    for(OLNode * current = node; current; current = current->prev) ++i;
     return i;
 }
 
-OLNode * olAdd(OrderedList * list, void * key, void * value) {
-    OLNode * successor = olSupremum(list, key),
-             * newNode = malloc(sizeof(OLNode));
-    newNode->key = key;
-    newNode->value = value;
-
+// Implementation detail. Insert a new node into the list, given a (null?)
+// successor.
+void olInsertNode_(OrderedList * list, OLNode * successor, OLNode * newNode) {
     if (!successor) {
         if (list->last) list->last->next = newNode;
         else list->first = newNode;
-        list->first = newNode;
+        list->last = newNode;
     } else {
         newNode->next = successor;
         newNode->prev = successor->prev;
@@ -86,18 +87,38 @@ OLNode * olAdd(OrderedList * list, void * key, void * value) {
         else list->first = newNode;
         successor->prev = newNode;
     }
+}
 
+OLNode * olAdd(OrderedList * list, void * key, void * value) {
+    OLNode * successor = olSupremum(list, key),
+             * newNode = malloc(sizeof(OLNode));
+    newNode->key = key;
+    newNode->value = value;
+    olInsertNode_(list, successor, newNode);
     return newNode;
 }
 
-void olRemove(OLNode * node) {
+OLNode * olAddWithoutDuplication(OrderedList * list, void * key, void * value) {
+    OLNode * successor = olSupremum(list, key);
+    if (successor && strcmp(successor->key, key)) return NULL;
+
+    OLNode * newNode = malloc(sizeof(OLNode));
+    newNode->key = key;
+    newNode->value = value;
+    olInsertNode_(list, successor, newNode);
+    return newNode;
+}
+
+void olRemove(OrderedList *list, OLNode * node) {
     if (node->prev) node->prev->next = node->next;
+    else list->first = node->next;
     if (node->next) node->next->prev = node->prev;
+    else list->last = node->prev;
     free(node);
 }
 
 #else
 
-// TODO: skiplist implementation
+// When SIMPLE_ORDERED_LIST is disabled, we use a stochastically balanced tree-like data structure called a skiplist.
 
 #endif

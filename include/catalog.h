@@ -11,33 +11,44 @@
 typedef struct ProductEntry ProductEntry;
 typedef struct ProductCatalog ProductCatalog;
 
-ReadStatus loadCatalog(ProductCatalog * catalog, Filepath filepath);
-ProductCatalog * demoCatalog();
+// Lifetime management and file IO.
+
+ReadStatus newCatalogFromFile(ProductCatalog ** catalog, Filepath filepath);
+void newCatalog(ProductCatalog ** catalog);
 
 void writeCatalog(ProductCatalog * catalog, char * filepath);
 void deleteCatalog(ProductCatalog *);
 
-typedef struct {
-    bool isEffective;
-    Category category;
-} CategoryFilter;
+// Accessing and modifying records.
 
 ProductEntry * catGetProductByID(ProductCatalog * catalog, ProductID * id);
-ProductEntry * catGetProductByPrefix(ProductCatalog * catalog, char * prefix, CategoryFilter * filter);
-ProductEntry * catGetProductByIndex(ProductCatalog * catalog, char * prefix, CategoryFilter * filter);
+ProductID * catGetProductID(ProductEntry * product);
+ProductRecord * catGetRecord(ProductEntry * product);
+void catDeleteEntry(ProductEntry *);
 
-ProductEntry * catNextProductAlphabetical(ProductEntry * pointer, CategoryFilter * filter);
-ProductEntry * catPreviousProductAlphabetical(ProductEntry * pointer, CategoryFilter * filter);
+// Listings.
 
-void catMostValuableProducts(ProductCatalog * catalog, ProductEntry  * valuable[3]);
-Price catNetValue(ProductCatalog * catalog);
+typedef enum {
+    bool orderAlphabetical;
+    bool useFilter;
+    Category filter;
+} ListingConfig;
 
-void deleteEntry(ProductEntry *);
-ProductRecord * getProductRecord(ProductEntry  * product);
-void setProductRecord(ProductEntry *product, ProductRecord * record);
-ProductID * getProductID(ProductEntry  * product);
-size_t getProductIndex(ProductEntry  * product);
+typedef struct {
+    ProductEntry * (*getFirst)(void);
+    ProductEntry * (*getLast)(void);
+    ProductEntry * (*getPrevious)(ProductEntry *);
+    ProductEntry * (*getLast)(ProductEntry *);
+    size_t (*getSize)();
+    size_t (*getIndex)(ProductEntry *);
+    ProductEntry (*snapEntry)(ProductEntry *);
+} ProductListing;
 
-ReadStatus reconcileFile(FILE * file, ProductCatalog * catalog);
+ProductListing * catGetListing(CatalogOrdering ordering, ListingConfig * filter);
+ProductEntry * jumpByString(CatalogOrdering ordering, ListingConfig *);
+
+// Miscellaneous stuff.
+
+ReadStatus loadRecords(ProductCatalog * catalog, FILE * input);
 
 #endif // CATALOG_H_INCLUDED
