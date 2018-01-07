@@ -3,25 +3,23 @@
 #include "algorithms/leaderboard.h"
 #include "algorithms/ordered_list.h"
 
-typedef struct CategoryRecord {
-    Category * category;
-    Price totalValue;
-    size_t totalRecords;
-    size_t totalInstances;
-} CategoryRecord;
-
-typedef struct Catalog {
+typedef struct ProductCatalog {
     OrderedList * categories;
     Dictionary * byId;
     OrderedList * byName;
     OrderedList * byPrice;
     size_t totalRecords;
     size_t totalInstances;
-} Catalog;
+} ProductCatalog;
 
+Catalog * newCatalog_() {
+    ProductCatalog * catalog = malloc(sizeof(Catalog));
+    catalog->categories = newOrderedList();
+]
 
 ReadStatus newCatalogFromFile(ProductCatalog ** catalog, Filepath filepath) {
 
+    loadFlatfile(filepath)
 }
 
 void newCatalog(ProductCatalog ** catalog) {
@@ -49,34 +47,6 @@ ProductRecord catGetRecord(ProductEntry * product) {
 }
 
 void catDeleteEntry(ProductEntry *) {
-
-}
-
-ProductEntry struct6_ProductListing::(* getFirst)(void) {
-
-}
-
-ProductEntry struct6_ProductListing::(* getLast)(void) {
-
-}
-
-ProductEntry struct6_ProductListing::(* getPrevious)(ProductEntry *) {
-
-}
-
-ProductEntry struct6_ProductListing::(* getLast)(ProductEntry *) {
-
-}
-
-struct6_ProductListing:: getSize() {
-
-}
-
-struct6_ProductListing:: getIndex(ProductEntry *) {
-
-}
-
-struct6_ProductListing:: snapEntry(ProductEntry *) {
 
 }
 
