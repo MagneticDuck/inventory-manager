@@ -52,9 +52,9 @@ void newCatalogEmpty(Catalog ** catalog) {
     catalog_->byPrice = newDictionary(&numericCompare);
 }
 
-void newCatalogDemo(Catalog ** catalog) {
+void newCatalogRandom(Catalog ** catalog, size_t categoryCount, size_t recordCount) {
     newCatalogEmpty(catalog);
-    readDemo((void *) *catalog, &onDefCategory_, &onDefRecord_);
+    readRandom(categoryCount, recordCount, (void *) *catalog, &onDefCategory_, &onDefRecord_);
 }
 
 typedef struct {

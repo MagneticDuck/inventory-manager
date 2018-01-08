@@ -8,24 +8,21 @@ void ppCategory(Category * category) {
     printf("%s (%i)\n", category->name, category->code);
 }
 
-Category * newRandomCategory(unsigned char code) {
-    Category * category = malloc(sizeof(Category));
+void randomCategory(Category * category, unsigned char code) {
     randomWord(category->name);
     category->code = code;
-    return category;
 }
 
 void ppRecord(ProductRecord * record) {
     printf("%s | %i | %s", record->name, record->price, record->category->name);
 }
 
-ProductRecord * newRandomRecord(Category * category) {
-    ProductRecord * record = malloc(sizeof(ProductRecord));
+void randomRecord(ProductRecord * record, Category * category) {
     randomWord(record->name);
+    randomProductID(record->id);
     record->category = category;
     record->price = randomIntRange(0, 10000);
     record->instances = randomIntRange(1, 50);
-    return record;
 }
 
 ReadStatus readFlatfile(
@@ -37,16 +34,17 @@ ReadStatus readFlatfile(
 }
 
 ReadStatus readRandom(
-    size_t categories, size_t records, void * catcher,
+    size_t categoryCount, size_t recordCount, void * catcher,
     bool (* onDefCategory)(void *, Category *),
     bool (* onDefRecord)(void *, ProductRecord *)) {
-    for(size_t i = 0; i <= 10; ++i) {
-        Category * category = newRandomCategory();
-        onDefCategory(catcher, category);
+    Category * categories = malloc(sizeof(Category) * categoryCount);
+    for(size_t i = 0; i <= categoryCount; ++i) {
+        randomCategory(&categories[i], i);
+        onDefCategory(catcher, &categories[i]);
     }
-    for(size_t i = 0; i <= 10000; ++i) {
+    for(size_t i = 0; i <= recordCount; ++i) {
         ProductRecord * record = malloc(sizeof(ProductRecord));
-        // stuff
+        randomRecord(record, &categories[randomIntRange(0, categories - 1)]);
         onDefRecord(catcher, record);
     }
     return READ_OK;

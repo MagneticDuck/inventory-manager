@@ -21,18 +21,18 @@ typedef struct {
 } Category;
 
 void ppCategory(Category *);
-Category * newRandomCategory(unsigned char code);
+void randomCategory(Category *, CategoryCode code);
 
 typedef struct {
-    char id[PRODUCT_ID_LENGTH]
+    char id[PRODUCT_ID_LENGTH];
     char name[MAX_STRING_LENGTH];
     Price price;
-    CategoryCode code;
+    Category *category;
     unsigned int instances;
 } ProductRecord;
 
 void ppRecord(ProductRecord *);
-ProductRecord * newRandomRecord();
+void randomRecord(ProductRecord *, Category *);
 
 typedef enum {
     READ_OK = 0,
@@ -49,9 +49,9 @@ ReadStatus readFlatfile(
     bool (*onDefRecord)(void *, ProductRecord *));
 
 ReadStatus readRandom(
-    size_t categories, size_t records, void * catcher,
+    size_t categoryCount, size_t recordCount, void * catcher,
     bool (*onDefCategory)(void *, Category *),
-    bool (*onDefRecord)(void *, ProductID *, ProductRecord *));
+    bool (*onDefRecord)(void *, ProductRecord *));
 
 typedef enum {
     WRITE_OK = 0,
