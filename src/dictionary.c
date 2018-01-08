@@ -2,8 +2,8 @@
 #define SIMPLE_DICTIONARY
 #ifdef SIMPLE_DICTIONARY
 
-#include "algorithms/dictionary.h"
-#include "algorithms/ordered_list.h"
+#include "dictionary.h"
+#include "ordered_list.h"
 
 // With SIMPLE_DICTIONARY enabled, we just wrap an `OrderedList`.
 

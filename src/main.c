@@ -3,7 +3,7 @@
 
 void main(void) {
     Catalog *catalog;
-    newCatalogDemo(&catalog);
+    newCatalogRandom(10, 1000, &catalog);
     ListingConfig config;
 
     interactListing(catalog, &config);

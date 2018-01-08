@@ -1,21 +1,47 @@
 #include "data.h"
 
+void randomProductID(ProductID id) {
+    randomWordFixed(PRODUCT_ID_LENGTH - 1, id);
+}
+
+void ppCategory(Category * category) {
+    printf("%s (%i)\n", category->name, category->code);
+}
+
+Category * newRandomCategory(unsigned char code) {
+    Category * category = malloc(sizeof(Category));
+    randomWord(category->name);
+    category->code = code;
+    return category;
+}
+
+void ppRecord(ProductRecord * record) {
+    printf("%s | %i | %s", record->name, record->price, record->category->name);
+}
+
+ProductRecord * newRandomRecord(Category * category) {
+    ProductRecord * record = malloc(sizeof(ProductRecord));
+    randomWord(record->name);
+    record->category = category;
+    record->price = randomIntRange(0, 10000);
+    record->instances = randomIntRange(1, 50);
+    return record;
+}
+
 ReadStatus readFlatfile(
     Filepath filepath, void * catcher,
-    bool (*onCategory)(Category *, void *),
-    bool (*onRecord)(ProductRecord *, void *)) {
+    bool (*onCategory)(void *, Category *),
+    bool (*onRecord)(void *, ProductRecord *)) {
     FILE * file = fopen(filepath, "r");
     // TODO
 }
 
-ReadStatus readDemo(
-    void * catcher,
+ReadStatus readRandom(
+    size_t categories, size_t records, void * catcher,
     bool (* onDefCategory)(void *, Category *),
     bool (* onDefRecord)(void *, ProductRecord *)) {
     for(size_t i = 0; i <= 10; ++i) {
-        Category * category = malloc(sizeof(Category));
-        category->code = i;
-        getRandomName(category->name);
+        Category * category = newRandomCategory();
         onDefCategory(catcher, category);
     }
     for(size_t i = 0; i <= 10000; ++i) {
@@ -24,14 +50,6 @@ ReadStatus readDemo(
         onDefRecord(catcher, record);
     }
     return READ_OK;
-}
-
-ProductRecord newRandomRecord() {
-
-}
-
-void freeRecord(ProductRecord *) {
-
 }
 
 ReadStatus readDemo(void * catcher, bool (* onDefCategory)(Category *, void *), bool (* onDefRecord)(ProductRecord *, void *)) {

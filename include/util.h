@@ -18,6 +18,12 @@ void unimplemented(void);
 bool lexiographicCompare(void * ptrA, void * ptrB);
 bool numericCompare(void * dataA, void * dataB);
 
+// Random.
+void initRandomSeed();
+int randomIntRange(int low, int high);
+void randomWordFixed(size_t length, char *);
+void randomWord(char *);
+
 void getRandomName(char str[]);
 
 timer_t getTime();

@@ -3,7 +3,7 @@
 #ifdef SIMPLE_ORDERED_LIST
 
 #include "util.h"
-#include "algorithms/ordered_list.h"
+#include "ordered_list.h"
 
 // When SIMPLE_ORDERED_LIST is enabled, we just use a linked list.
 
@@ -32,6 +32,10 @@ void freeOrderedList(OrderedList * list) {
 
 OLNode * olFirst(OrderedList * list) {
     return list->first;
+}
+
+OLNode * olLast(OrderedList * list) {
+    return list->last;
 }
 
 OLNode * olSupremum(OrderedList * list, void * key) {

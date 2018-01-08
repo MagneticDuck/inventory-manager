@@ -1,15 +1,16 @@
 # depslib dependency file v1.0
-1515345052 source:/home/magneticduck/git/great-project/test/test.c
+1515439828 source:/home/magneticduck/git/great-project/test/test.c
 	"tinytest.h"
 	"util.h"
-	"algorithms/ordered_list.h"
-	"algorithms/dictionary.h"
+	"data.h"
+	"ordered_list.h"
+	"dictionary.h"
 
 1514985137 /home/magneticduck/git/great-project/test/tinytest.h
 	<stdio.h>
 	<stdlib.h>
 
-1515434044 /home/magneticduck/git/great-project/include/util.h
+1515439634 /home/magneticduck/git/great-project/include/util.h
 	<stdio.h>
 	<stddef.h>
 	<stdlib.h>
@@ -19,10 +20,10 @@
 1515420303 /home/magneticduck/git/great-project/include/algorithms/ordered_list.h
 	"util.h"
 
-1515268388 source:/home/magneticduck/git/great-project/src/data.c
+1515439503 source:/home/magneticduck/git/great-project/src/data.c
 	"data.h"
 
-1515422451 /home/magneticduck/git/great-project/include/data.h
+1515439159 /home/magneticduck/git/great-project/include/data.h
 	<stdio.h>
 	"util.h"
 
@@ -30,13 +31,16 @@
 	"util.h"
 	"algorithms/ordered_list.h"
 
-1515422252 source:/home/magneticduck/git/great-project/src/util.c
+1515439766 source:/home/magneticduck/git/great-project/src/util.c
 	"util.h"
 
-1515147007 source:/home/magneticduck/git/great-project/src/catalog.c
+1515439710 source:/home/magneticduck/git/great-project/src/catalog.c
 	"catalog.h"
+	"dictionary.h"
+	"ordered_list.h"
+	"data.h"
 
-1515422925 /home/magneticduck/git/great-project/include/catalog.h
+1515439125 /home/magneticduck/git/great-project/include/catalog.h
 	<stdio.h>
 	"data.h"
 	"util.h"
@@ -48,7 +52,21 @@
 
 1515344679 /home/magneticduck/git/great-project/include/algorithms/dictionary.h
 
-1515422633 source:/home/magneticduck/git/great-project/src/listing_ui.c
+1515433569 source:/home/magneticduck/git/great-project/src/listing_ui.c
 	"data.h"
 	"catalog.h"
+
+1515344679 /home/magneticduck/git/great-project/include/dictionary.h
+
+1515439724 /home/magneticduck/git/great-project/include/ordered_list.h
+	"util.h"
+
+1515439521 source:/home/magneticduck/git/great-project/src/dictionary.c
+	"dictionary.h"
+	"ordered_list.h"
+	"util.h"
+
+1515439744 source:/home/magneticduck/git/great-project/src/ordered_list.c
+	"util.h"
+	"ordered_list.h"
 

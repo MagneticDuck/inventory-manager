@@ -13,6 +13,25 @@ bool lexiographicCompare(void * ptrA, void * ptrB) {
     }
 }
 
+void initRandomSeed() {
+    srand(time(NULL));
+}
+
+int randomIntRange(int low, int high) {
+    return (rand() % (low - high + 1)) + low;
+}
+
+void randomWordFixed(size_t length, char * str) {
+    for (size_t i = 0; i < length; ++i)
+        str[i] = (char) randomIntRange((int) 'a', (int) 'z');
+    str[length] = '\0';
+    return str;
+}
+
+void randomWord(char * str) {
+    randomWordFixed(rand() % 7 + 5, str);
+}
+
 bool numericCompare(void* dataA, void* dataB) {
     return (int *) dataA <= (int *) dataB;
 }

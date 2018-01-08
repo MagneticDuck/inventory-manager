@@ -1,7 +1,8 @@
 #include "tinytest.h"
 #include "util.h"
-#include "algorithms/ordered_list.h"
-#include "algorithms/dictionary.h"
+#include "data.h"
+#include "ordered_list.h"
+#include "dictionary.h"
 
 // These tests were written as a part of the code's development and now are essentially safeguards against regression.
 // They are not meant to be complete unit-tests.
@@ -63,9 +64,27 @@ void testDictionary() {
     freeDictionary(dictionary);
 }
 
+void testRandom() {
+    char word[10];
+    randomWordFixed(9, word);
+    Category * category = newRandomCategory(1);
+    ProductRecord * record = newRandomRecord(category);
+
+    printf("%s\n", word);
+    ppRecord(record);
+    ppCategory(category);
+
+    // ASSERT_LOOKS_OK
+
+    free(record);
+    free(category);
+}
+
 int main() {
+    initRandomSeed();
     RUN(testLexiographicCompare);
     RUN(testOrderedList);
     RUN(testDictionary);
+    RUN(testRandom);
     return TEST_REPORT();
 }

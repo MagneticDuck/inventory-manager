@@ -88,7 +88,7 @@ void freeCatalog(Catalog * catalog) {
     freeOrderedList(catalog->byPrice);
     freeOrderedList(catalog->categoryLeaderboard);
     for(size_t i = 0; i < catalog->categoryCount; ++i)
-        freeCategory(catalog->categories[i]);
+        free(catalog->categories[i]);
     free(catalog);
 }
 

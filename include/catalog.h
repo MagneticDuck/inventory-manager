@@ -16,7 +16,7 @@ typedef struct Catalog Catalog;
 
 ReadStatus newCatalogFromFile(Catalog ** catalog, Filepath filepath);
 void newCatalogEmpty(Catalog ** catalog);
-void newCatalogDemo(Catalog ** catalog);
+void newCatalogRandom(Catalog ** catalog, size_t categories, size_t records);
 
 void writeCatalog(Catalog * catalog, char * filepath);
 void freeCatalog(Catalog *);
