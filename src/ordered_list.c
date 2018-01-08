@@ -42,8 +42,8 @@ OLNode * olSupremum(OrderedList * list, void * key) {
     }
 }
 
-OLNode * olSeekBy(OrderedList * list, size_t seek) {
-    OLNode * current = list->first;
+OLNode * olSeekBy(OLNode * node, size_t seek) {
+    OLNode * current = node;
     while(seek > 0 && current) {
         current = current->next;
         --seek;

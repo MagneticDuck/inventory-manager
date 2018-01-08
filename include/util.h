@@ -12,6 +12,8 @@
 
 #define loop for(;;)
 
+void unimplemented(void);
+
 // A <= B
 bool lexiographicCompare(void * ptrA, void * ptrB);
 bool numericCompare(void * dataA, void * dataB);

@@ -19,9 +19,6 @@ typedef struct {
     char name[MAX_STRING_LENGTH];
 } Category;
 
-Category * newRandomCategory(unsigned char code);
-void freeCategory(Category *);
-
 typedef struct {
     char name[MAX_STRING_LENGTH];
     Price price;
@@ -57,10 +54,8 @@ typedef enum {
 } WriteStatus;
 
 WriteStatus writeFlatfile(
-    Filepath filepath, void * write,
-    Category * (popCategory)(),
-    ProductRecord * (popRecord)());
-
-WriteStatus writeDemoFlatfile(Filepath filepath);
+    Filepath filepath, void * iterator,
+    bool (popCategory)(void *, Category **),
+    bool (popRecord)(void *, ProductRecord **));
 
 #endif // DATA_H_INCLUDED

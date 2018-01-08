@@ -1,5 +1,9 @@
 #include "util.h"
 
+void unimplemented(void) {
+    printf("asjdfjslkdjflkdsa");
+}
+
 bool lexiographicCompare(void * ptrA, void * ptrB) {
     char * strA = (char *) ptrA, * strB = (char *) ptrB;
     for(size_t i = 0;; ++i) {

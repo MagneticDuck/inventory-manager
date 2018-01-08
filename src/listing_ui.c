@@ -18,7 +18,7 @@ void displayListing(ListingState * state) {
     ProductEntry * entry = state->head;
     for(int i = 10; i > 0 && entry; --i) {
         printEntry(state, entry);
-        entry = catGetNext(state->catalog, state->config, entry);
+        entry = catNext(state->catalog, state->config, entry);
     }
     printf(">");
 }
