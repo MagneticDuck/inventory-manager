@@ -12,7 +12,9 @@
 
 #define loop for(;;)
 
+// A <= B
 bool lexiographicCompare(void * ptrA, void * ptrB);
+bool numericCompare(void * dataA, void * dataB);
 
 void getRandomName(char str[]);
 

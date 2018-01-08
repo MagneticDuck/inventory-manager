@@ -19,6 +19,9 @@ typedef struct {
     char name[MAX_STRING_LENGTH];
 } Category;
 
+Category * newRandomCategory(unsigned char code);
+void freeCategory(Category *);
+
 typedef struct {
     char name[MAX_STRING_LENGTH];
     Price price;
@@ -26,7 +29,8 @@ typedef struct {
     unsigned int instances;
 } ProductRecord;
 
-/// Top-level. ///
+ProductRecord * newRandomRecord();
+void freeRecord(ProductRecord *);
 
 typedef enum {
     READ_OK = 0,
@@ -37,12 +41,12 @@ typedef enum {
 
 // These methods have the responsibility of allocating the memory for Category and ProductRecord.
 // Of course, the responsibility of cleaning up falls on Catalog.
-ReadStatus loadFlatfile(
+ReadStatus readFlatfile(
     Filepath filepath, void * reader,
     bool (*onDefCategory)(Category *, void *),
     bool (*onDefRecord)(ProductRecord *, void *));
 
-ReadStatus loadDemoFlatfile(
+ReadStatus readDemo(
     void * catcher,
     bool (*onDefCategory)(Category *, void *),
     bool (*onDefRecord)(ProductRecord *, void *));

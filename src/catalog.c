@@ -2,47 +2,69 @@
 #include "algorithms/dictionary.h"
 #include "algorithms/leaderboard.h"
 #include "algorithms/ordered_list.h"
+#include "data.h"
 
-typedef struct ProductCatalog {
-    OrderedList * categories;
+typedef struct ProductEntry {
+    ProductRecord * record;
+    ProductID * id;
+    OLNode * byName;
+    OLNode * byPrice;
+    DictEntry * byId;
+} ProductEntry;
+
+typedef struct Catalog {
+    Category ** categories;
+    size_t categoryCount;
+
+    OrderedList * categoryLeaderboard;
     Dictionary * byId;
     OrderedList * byName;
     OrderedList * byPrice;
     size_t totalRecords;
     size_t totalInstances;
-} ProductCatalog;
+} Catalog;
 
-Catalog * newCatalog_() {
-    ProductCatalog * catalog = malloc(sizeof(Catalog));
-    catalog->categories = newOrderedList();
-]
-
-ReadStatus newCatalogFromFile(ProductCatalog ** catalog, Filepath filepath) {
-
-    loadFlatfile(filepath)
+bool onDefCategory_(Category * category, void * catcher) {
+    Catalog * catalog = (Catalog *) catcher;
+    catalog->categories[catalog->categoryCount++] = category;
+    olAdd(catalog->categoryLeaderboard, (void *) 0, (void *) category);
 }
 
-void newCatalog(ProductCatalog ** catalog) {
-
+bool onDefRecord_(ProductRecord *, void * catcher) {
+    Catalog * catalog = (Catalog *) catcher;
 }
 
-void writeCatalog(ProductCatalog * catalog, char * filepath) {
+ReadStatus newCatalogFromFile(Catalog ** catalog, Filepath filepath) {
+    newCatalogEmpty(catalog);
 
 }
 
-void deleteCatalog(ProductCatalog *) {
+void newCatalogEmpty(Catalog ** catalog) {
 
 }
 
-ProductEntry catGetProductByID(ProductCatalog * catalog, ProductID * id) {
+void newCatalogDemo(Catalog ** catalog) {
+    newCatalogEmpty(catalog);
 
 }
 
-ProductID catGetProductID(ProductEntry * product) {
+void writeCatalog(Catalog * catalog, char * filepath) {
 
 }
 
-ProductRecord catGetRecord(ProductEntry * product) {
+void deleteCatalog(Catalog *) {
+
+}
+
+ProductEntry * catGetProductByID(Catalog * catalog, ProductID * id) {
+
+}
+
+ProductID * catGetProductID(ProductEntry * product) {
+    return product->id;
+}
+
+ProductRecord * catGetRecord(ProductEntry * product) {
 
 }
 
@@ -50,14 +72,30 @@ void catDeleteEntry(ProductEntry *) {
 
 }
 
-ProductListing catGetListing(CatalogOrdering ordering, ListingConfig * filter) {
+ProductEntry catGetNext(Catalog *, ListingConfig * config, ProductEntry *) {
 
 }
 
-ProductEntry jumpByString(CatalogOrdering ordering, ListingConfig *) {
+ProductEntry catSeekBy(Catalog *, ListingConfig * config, ProductEntry *, size_t seeking) {
 
 }
 
-ReadStatus loadRecords(ProductCatalog * catalog, FILE * input) {
+ProductEntry catGetPrev(Catalog *, ListingConfig * config, ProductEntry *) {
+
+}
+
+ProductEntry catAlphabeticalSupremum(Catalog *, ListingConfig * config, char * prefix) {
+
+}
+
+ProductEntry catPriceSupremum(Catalog *, ListingConfig * config, int price) {
+
+}
+
+ProductEntry catLookup(Catalog *, ListingConfig * config, ProductID id) {
+
+}
+
+ReadStatus loadRecords(Catalog * catalog, FILE * input) {
 
 }

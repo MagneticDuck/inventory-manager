@@ -57,6 +57,9 @@
 		<Unit filename="include/data.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
+		<Unit filename="include/listing_ui.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
 		<Unit filename="include/util.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
@@ -75,6 +78,9 @@
 			<Option compilerVar="CC" />
 			<Option target="Debug" />
 			<Option target="Release" />
+		</Unit>
+		<Unit filename="src/listing_ui.c">
+			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/main.c">
 			<Option compilerVar="CC" />

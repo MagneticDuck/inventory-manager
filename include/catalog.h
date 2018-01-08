@@ -7,48 +7,45 @@
 
 #include <stdio.h>
 #include "data.h"
+#include "util.h"
 
 typedef struct ProductEntry ProductEntry;
-typedef struct ProductCatalog ProductCatalog;
+typedef struct Catalog Catalog;
 
 // Lifetime management and file IO.
 
-ReadStatus newCatalogFromFile(ProductCatalog ** catalog, Filepath filepath);
-void newCatalog(ProductCatalog ** catalog);
+ReadStatus newCatalogFromFile(Catalog ** catalog, Filepath filepath);
+void newCatalogEmpty(Catalog ** catalog);
+void newCatalogDemo(Catalog ** catalog);
 
-void writeCatalog(ProductCatalog * catalog, char * filepath);
-void deleteCatalog(ProductCatalog *);
+void writeCatalog(Catalog * catalog, char * filepath);
+void deleteCatalog(Catalog *);
 
 // Accessing and modifying records.
 
-ProductEntry * catGetProductByID(ProductCatalog * catalog, ProductID * id);
+ProductEntry * catGetProductByID(Catalog * catalog, ProductID * id);
 ProductID * catGetProductID(ProductEntry * product);
 ProductRecord * catGetRecord(ProductEntry * product);
 void catDeleteEntry(ProductEntry *);
 
 // Listings.
 
-typedef enum {
+typedef struct {
     bool orderAlphabetical;
     bool useFilter;
-    Category filter;
+    int categoryFilter;
 } ListingConfig;
 
-typedef struct {
-    ProductEntry * (*getFirst)(void);
-    ProductEntry * (*getLast)(void);
-    ProductEntry * (*getPrevious)(ProductEntry *);
-    ProductEntry * (*getLast)(ProductEntry *);
-    size_t (*getSize)();
-    size_t (*getIndex)(ProductEntry *);
-    ProductEntry (*snapEntry)(ProductEntry *);
-} ProductListing;
+ProductEntry * catGetNext(Catalog *, ListingConfig * config, ProductEntry *);
+ProductEntry * catSeekBy(Catalog *, ListingConfig * config, ProductEntry *, size_t seeking);
+ProductEntry * catGetPrev(Catalog *, ListingConfig * config, ProductEntry *);
 
-ProductListing * catGetListing(CatalogOrdering ordering, ListingConfig * filter);
-ProductEntry * jumpByString(CatalogOrdering ordering, ListingConfig *);
+ProductEntry * catAlphabeticalSupremum(Catalog *, ListingConfig * config, char * prefix);
+ProductEntry * catPriceSupremum(Catalog *, ListingConfig *config, int price);
+ProductEntry * catLookup(Catalog *, ListingConfig *config, ProductID id);
 
 // Miscellaneous stuff.
 
-ReadStatus loadRecords(ProductCatalog * catalog, FILE * input);
+ReadStatus loadRecords(Catalog * catalog, FILE * input);
 
 #endif // CATALOG_H_INCLUDED

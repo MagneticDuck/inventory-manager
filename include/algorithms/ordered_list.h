@@ -17,7 +17,7 @@ void freeOrderedList(OrderedList *);
 
 OLNode * olFirst(OrderedList *);
 OLNode * olSupremum(OrderedList *, void * key); // Gives last node with key >= to the key presented.
-OLNode * olSeekBy(OrderedList *, size_t seek);
+OLNode * olSeekBy(OrderedList *, size_t seeking);
 OLNode * olNext(OLNode *);
 OLNode * olPrev(OLNode *);
 

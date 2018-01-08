@@ -9,6 +9,10 @@ bool lexiographicCompare(void * ptrA, void * ptrB) {
     }
 }
 
+bool numericCompare(void* dataA, void* dataB) {
+    return (int *) dataA <= (int *) dataB;
+}
+
 void getRandomName(char name[]) {
 
 }

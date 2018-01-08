@@ -1,6 +1,6 @@
 #include "data.h"
 
-ReadStatus loadFlatfile(
+ReadStatus readFlatfile(
     Filepath filepath, void * catcher,
     bool (*onCategory)(Category *, void *),
     bool (*onRecord)(ProductRecord *, void *)) {
@@ -8,7 +8,7 @@ ReadStatus loadFlatfile(
     // TODO
 }
 
-ReadStatus loadDemoFlatfile(
+ReadStatus readDemo(
     void * catcher,
     bool (* onDefCategory)(void *, Category *),
     bool (* onDefRecord)(void *, ProductRecord *)) {
