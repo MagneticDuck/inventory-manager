@@ -6,9 +6,9 @@
 #include <stdio.h>
 #include "util.h"
 
-typedef char * Filepath;
 #define PRODUCT_ID_LENGTH 20
 #define MAX_STRING_LENGTH 50
+#define MAX_CATEGORIES 100
 
 typedef char ProductID[PRODUCT_ID_LENGTH];
 
@@ -34,31 +34,21 @@ typedef struct {
 void ppRecord(ProductRecord *);
 void randomRecord(ProductRecord *, Category *);
 
-typedef enum {
-    READ_OK = 0,
-    READ_BAD_IO, // Can't write to the file.
-    READ_BAD_PARSE, // Can't parse what's on the file.
-    READ_BAD_SANITIZE // The parsed information can't be cataloged.
-} ReadStatus;
-
 // These methods have the responsibility of allocating the memory for Category and ProductRecord.
 // Of course, the responsibility of cleaning up falls on Catalog.
-ReadStatus readFlatfile(
+
+// True is for success, as usual.
+bool loadFlatfile(
     Filepath filepath, void * reader,
     bool (*onDefCategory)(void *, Category *),
     bool (*onDefRecord)(void *, ProductRecord *));
 
-ReadStatus readRandom(
+bool loadRandom(
     size_t categoryCount, size_t recordCount, void * catcher,
     bool (*onDefCategory)(void *, Category *),
     bool (*onDefRecord)(void *, ProductRecord *));
 
-typedef enum {
-    WRITE_OK = 0,
-    WRITE_BAD_PATH
-} WriteStatus;
-
-WriteStatus writeFlatfile(
+bool writeFlatfile(
     Filepath filepath, void * iterator,
     bool (popCategory)(void *, Category **),
     bool (popRecord)(void *, ProductRecord **));

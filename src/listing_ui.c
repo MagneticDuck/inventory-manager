@@ -9,8 +9,7 @@ typedef struct {
 } ListingState;
 
 void printEntry(ListingState * state, ProductEntry * entry) {
-    printf("%s", catGetProductID(entry));
-    printf("%s", catGetRecord(entry)->name);
+    ppRecord(catProductRecord(entry));
 }
 
 void displayListing(ListingState * state) {
@@ -82,7 +81,7 @@ void interactListing(Catalog * catalog, ListingConfig * config) {
     ListingState state;
     state.catalog = catalog;
     state.config = config;
-    state.head = catFirst(catalog);
+    state.head = catFirst(catalog, config);
     state.consoleHeight = 10; // TODO: find real console height
 
     loop {
@@ -90,7 +89,7 @@ void interactListing(Catalog * catalog, ListingConfig * config) {
         char input[MAX_STRING_LENGTH];
         scanf("%s", input);
         InterpretResult result;
-        if(result = interpretInput(&state, input)) {
+        if((result = interpretInput(&state, input))) {
             if(result == INTERPRET_MESSAGE) scanf("%s", input);
             if(result == INTERPRET_QUIT) break;
             // unreachable

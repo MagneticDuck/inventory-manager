@@ -2,6 +2,7 @@
 #include "util.h"
 #include "data.h"
 #include "ordered_list.h"
+#include "catalog.h"
 #include "dictionary.h"
 
 // These tests were written as a part of the code's development and now are essentially safeguards against regression.
@@ -19,6 +20,8 @@ void testOrderedList() {
     OrderedList * list = newOrderedList(&lexiographicCompare);
     OLNode * nodes[4];
 
+    ASSERT_EQUALS(olSupremum(list, "hello world"), NULL);
+
     nodes[0] = olAdd(list, "abc", NULL);
     nodes[1] = olAdd(list, "", NULL);
     nodes[2] = olAdd(list, "abba", NULL);
@@ -28,6 +31,14 @@ void testOrderedList() {
     ASSERT_EQUALS(olIndex(nodes[3]), 1);
     ASSERT_EQUALS(olIndex(nodes[2]), 2);
     ASSERT_EQUALS(olIndex(nodes[0]), 3);
+    printf("hello world\n");
+
+    olReindex(list, nodes[1], "oops");
+
+    ASSERT_EQUALS(olIndex(nodes[3]), 0);
+    ASSERT_EQUALS(olIndex(nodes[2]), 1);
+    ASSERT_EQUALS(olIndex(nodes[0]), 2);
+    ASSERT_EQUALS(olIndex(nodes[1]), 3);
 
     ASSERT_EQUALS(olNext(nodes[1]), nodes[3]);
     ASSERT_EQUALS(olPrev(nodes[3]), nodes[1]);
@@ -64,20 +75,16 @@ void testDictionary() {
     freeDictionary(dictionary);
 }
 
-void testRandom() {
-    char word[10];
-    randomWordFixed(9, word);
-    Category * category = newRandomCategory(1);
-    ProductRecord * record = newRandomRecord(category);
+void testRandomCatalog() {
+    Catalog *catalog;
+    newCatalogRandom(&catalog, 10, 1000);
+    freeCatalog(catalog);
+}
 
-    printf("%s\n", word);
-    ppRecord(record);
-    ppCategory(category);
-
-    // ASSERT_LOOKS_OK
-
-    free(record);
-    free(category);
+void testLoadingCatalog() {
+    Catalog *catalog;
+    newCatalogFromFile(&catalog, "data/demo.txt");
+    freeCatalog(catalog);
 }
 
 int main() {
@@ -85,6 +92,7 @@ int main() {
     RUN(testLexiographicCompare);
     RUN(testOrderedList);
     RUN(testDictionary);
-    RUN(testRandom);
+    // RUN(testRandomCatalog);
+    // RUN(testLoadingCatalog);
     return TEST_REPORT();
 }

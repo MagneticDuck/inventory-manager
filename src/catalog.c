@@ -5,56 +5,68 @@
 
 typedef struct ProductEntry {
     ProductRecord * record;
-    ProductID * id;
-    OLNode * byName;
-    OLNode * byPrice;
     DictEntry * byId;
+    OLNode * byName[MAX_CATEGORIES + 1];
+    OLNode * byPrice[MAX_CATEGORIES + 1];
 } ProductEntry;
 
 typedef struct Catalog {
-    Category ** categories;
+    Category * categories[MAX_CATEGORIES];
+    CategoryStats categoryStats[MAX_CATEGORIES];
     size_t categoryCount;
 
     OrderedList * categoryLeaderboard;
     Dictionary * byId;
-    OrderedList * byName;
-    OrderedList * byPrice;
+    OrderedList * byName[MAX_CATEGORIES + 1];
+    OrderedList * byPrice[MAX_CATEGORIES + 1];
 
     size_t totalRecords;
     unsigned int totalInstances;
 } Catalog;
 
-bool onDefCategory_(Category * category, void * ptr) {
+bool onDefCategory_(void * ptr, Category * category) {
     Catalog * catalog = (Catalog *) ptr;
     catalog->categories[catalog->categoryCount++] = category;
     olAdd(catalog->categoryLeaderboard, (void *) 0, (void *) category);
+    return true;
 }
 
-bool onDefRecord_(ProductID id, ProductRecord * record, void * ptr) {
+bool onDefRecord_(void * ptr, ProductRecord * record) {
     Catalog * catalog = (Catalog *) ptr;
-    dictAdd(catalog->byId, (void *) id, (void *) record);
+    dictAdd(catalog->byId, (void *) record->id, (void *) record);
     olAdd(catalog->byName, (void *) record->name, (void *) record);
     olAdd(catalog->byPrice, (void *) record->price, (void *) record);
     ++catalog->totalRecords;
     catalog->totalInstances += record->instances;
+    return true;
 }
 
-ReadStatus newCatalogFromFile(Catalog ** catalog, Filepath filepath) {
-    newCatalogEmpty(catalog);
-    readFlatfile(filepath, (void *) *catalog, &onDefCategory_, &onDefRecord_);
-}
-
-void newCatalogEmpty(Catalog ** catalog) {
+void newEmptyCatalog(Catalog ** catalog) {
     *catalog = malloc(sizeof(Catalog));
     Catalog * catalog_ = *catalog;
     catalog_->byId = newDictionary();
-    catalog_->byName = newDictionary(&lexiographicCompare);
-    catalog_->byPrice = newDictionary(&numericCompare);
+    catalog_->byName[0] = newOrderedList(&lexiographicCompare);
+    catalog_->byPrice[0] = newOrderedList(&numericCompare);
+}
+
+bool newCatalogFromFile(Catalog ** catalog, Filepath filepath) {
+    newEmptyCatalog(catalog);
+    loadFlatfile(filepath, (void *) *catalog, &onDefCategory_, &onDefRecord_);
 }
 
 void newCatalogRandom(Catalog ** catalog, size_t categoryCount, size_t recordCount) {
-    newCatalogEmpty(catalog);
-    readRandom(categoryCount, recordCount, (void *) *catalog, &onDefCategory_, &onDefRecord_);
+    newEmptyCatalog(catalog);
+    loadRandom(categoryCount, recordCount, (void *) *catalog, &onDefCategory_, &onDefRecord_);
+}
+
+void freeCatalog(Catalog * catalog) {
+    freeDictionary(catalog->byId);
+    freeOrderedList(catalog->byName);
+    freeOrderedList(catalog->byPrice);
+    freeOrderedList(catalog->categoryLeaderboard);
+    for(size_t i = 0; i < catalog->categoryCount; ++i)
+        free(catalog->categories[i]);
+    free(catalog);
 }
 
 typedef struct {
@@ -82,26 +94,12 @@ void writeCatalog(Catalog * catalog, char * filepath) {
     writeFlatfile(filepath, (void *) &iterator, &popCategory_, &popRecord_);
 }
 
-void freeCatalog(Catalog * catalog) {
-    freeDictionary(catalog->byId);
-    freeOrderedList(catalog->byName);
-    freeOrderedList(catalog->byPrice);
-    freeOrderedList(catalog->categoryLeaderboard);
-    for(size_t i = 0; i < catalog->categoryCount; ++i)
-        free(catalog->categories[i]);
-    free(catalog);
-}
-
-ProductEntry * catGetProductByID(Catalog * catalog, ProductID * id) {
+ProductEntry * catLookupProduct(Catalog * catalog, ProductID * id) {
 
 }
 
-ProductID * catGetProductID(ProductEntry * product) {
-    return product->id;
-}
-
-ProductRecord * catGetRecord(ProductEntry * product) {
-
+ProductRecord * catProductRecord(ProductEntry * product) {
+    return product->record;
 }
 
 void catRemove(Catalog * catalog, ProductEntry * entry) {
@@ -111,62 +109,55 @@ void catRemove(Catalog * catalog, ProductEntry * entry) {
 }
 
 OLNode * getRelevantNode_(ProductEntry * entry, ListingConfig * config) {
-    if(!config->categoryFilter) {
-        if(config->orderAlphabetical) return entry->byName;
-        else return entry->byPrice;
-    } else {
-        unimplemented();
-        return NULL;
-    }
+    OLNode ** index;
+    if(config->orderAlphabetical) index = entry->byName;
+    else index = entry->byPrice;
+    if(!config->useFilter) return index[0];
+    else return index[config->categoryFilter + 1];
 }
 
 OrderedList * getRelevantList_(Catalog * catalog, ListingConfig * config) {
-    if(!config->categoryFilter) {
-        if(config->orderAlphabetical) return catalog->byName;
-        else return catalog->byPrice;
-    } else {
-        unimplemented();
-        return NULL;
-    }
+    OrderedList ** index;
+    if(config->orderAlphabetical) index = catalog->byName;
+    else index = catalog->byPrice;
+    if(!config->useFilter) return index[0];
+    else return index[config->categoryFilter + 1];
 }
 
-ProductEntry * catFirst(Catalog * catalog, ListingConfig *config) {
-    return (ProductEntry *) olValue(
-        olFirst(getRelevantList_(catalog, config)));
+ProductEntry * catFirst(Catalog * catalog, ListingConfig * config) {
+    return (ProductEntry *) olValue(olFirst(getRelevantList_(catalog, config)));
 }
 
-ProductEntry * catLast(Catalog * catalog, ListingConfig *config) {
-    return (ProductEntry *) olValue(
-        olLast(getRelevantList_(catalog, config)));
+ProductEntry * catLast(Catalog * catalog, ListingConfig * config) {
+    return (ProductEntry *) olValue(olLast(getRelevantList_(catalog, config)));
 }
 
 ProductEntry * catNext(Catalog * catalog, ListingConfig * config, ProductEntry * entry) {
-    return (ProductEntry *) olValue(
-               olNext(getRelevantNode_(entry, config)));
+    return (ProductEntry *) olValue(olNext(getRelevantNode_(entry, config)));
 }
 
 ProductEntry * catSeekBy(Catalog * catalog, ListingConfig * config, ProductEntry * entry, size_t seeking) {
-    return (ProductEntry *) olValue(
-               olSeekBy(getRelevantNode_(entry, config), seeking));
+    return (ProductEntry *) olValue(olSeekBy(getRelevantNode_(entry, config), seeking));
 }
 
 ProductEntry * catPrev(Catalog * catalog, ListingConfig * config, ProductEntry * entry) {
-    return (ProductEntry *) olValue(
-               olPrev(getRelevantNode_(entry, config)));
+    return (ProductEntry *) olValue(olPrev(getRelevantNode_(entry, config)));
 }
 
 ProductEntry * catAlphabeticalSupremum(Catalog * catalog, ListingConfig * config, char * prefix) {
-
+    OrderedList * relevant;
+    if(!config->useFilter) relevant = catalog->byName[0];
+    else relevant = catalog->byName[config->categoryFilter + 1];
+    return (ProductEntry *) olValue(olSupremum(relevant, prefix));
 }
 
 ProductEntry * catPriceSupremum(Catalog * catalog, ListingConfig * config, int price) {
-
+    OrderedList * relevant;
+    if(!config->useFilter) relevant = catalog->byPrice[0];
+    else relevant = catalog->byPrice[config->categoryFilter + 1];
+    return (ProductEntry *) olValue(olSupremum(relevant, price));
 }
 
 ProductEntry * catLookup(Catalog * catalog, ListingConfig * config, ProductID id) {
     return (ProductEntry *) dictValue(dictLookup(catalog->byId, id));
-}
-
-ReadStatus loadRecords(Catalog * catalog, FILE * input) {
-
 }

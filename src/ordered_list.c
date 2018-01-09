@@ -39,6 +39,7 @@ OLNode * olLast(OrderedList * list) {
 }
 
 OLNode * olSupremum(OrderedList * list, void * key) {
+    if(!list->first) return NULL;
     OLNode * current = list->first;
     loop {
         if(!current || (*list->ordering)(key, current->key)) return current;
@@ -63,6 +64,13 @@ OLNode * olPrev(OLNode * node) {
     return node->prev;
 }
 
+void ** olValue(OLNode * node) {
+    return &node->value;
+}
+
+void * olKey(OLNode * node) {
+    return node->key;
+}
 
 size_t olIndex(OLNode * node) {
     size_t i = -1;
@@ -70,17 +78,15 @@ size_t olIndex(OLNode * node) {
     return i;
 }
 
-// Implementation detail. Insert a new node into the list, given a (null?)
-// successor.
-void olInsertNode_(OrderedList * list, OLNode * successor, OLNode * newNode) {
-    if (!successor) {
-        if (list->last) list->last->next = newNode;
+void olInsertBefore_(OrderedList * list, OLNode * successor, OLNode * newNode) {
+    if(!successor) {
+        if(list->last) list->last->next = newNode;
         else list->first = newNode;
         list->last = newNode;
     } else {
         newNode->next = successor;
         newNode->prev = successor->prev;
-        if (successor->prev) successor->prev->next = newNode;
+        if(successor->prev) successor->prev->next = newNode;
         else list->first = newNode;
         successor->prev = newNode;
     }
@@ -91,34 +97,37 @@ OLNode * olAdd(OrderedList * list, void * key, void * value) {
              * newNode = malloc(sizeof(OLNode));
     newNode->key = key;
     newNode->value = value;
-    olInsertNode_(list, successor, newNode);
+    olInsertBefore_(list, successor, newNode);
     return newNode;
 }
 
 OLNode * olAddWithoutDuplication(OrderedList * list, void * key, void * value) {
     OLNode * successor = olSupremum(list, key);
-    if (successor && strcmp(successor->key, key) == 0) return NULL;
+    if(successor && strcmp(successor->key, key) == 0) return NULL;
     OLNode * newNode = malloc(sizeof(OLNode));
     newNode->key = key;
     newNode->value = value;
-    olInsertNode_(list, successor, newNode);
+    olInsertBefore_(list, successor, newNode);
     return newNode;
 }
 
-void olRemove(OrderedList *list, OLNode * node) {
-    if (node->prev) node->prev->next = node->next;
+void olPluck_(OrderedList * list, OLNode * node) {
+    if(node->prev) node->prev->next = node->next;
     else list->first = node->next;
-    if (node->next) node->next->prev = node->prev;
+    if(node->next) node->next->prev = node->prev;
     else list->last = node->prev;
+}
+
+void olReindex(OrderedList * list, OLNode * node, void * newKey) {
+    olPluck_(list, node);
+    OLNode * successor = olSupremum(list, newKey);
+    node->key = newKey;
+    olInsertBefore_(list, successor, node);
+}
+
+void olRemove(OrderedList * list, OLNode * node) {
+    olPluck_(list, node);
     free(node);
-}
-
-void ** olValue(OLNode * node) {
-    return &node->value;
-}
-
-void * olKey(OLNode * node) {
-    return node->key;
 }
 
 #else

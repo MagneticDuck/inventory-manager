@@ -25,15 +25,62 @@ void randomRecord(ProductRecord * record, Category * category) {
     record->instances = randomIntRange(1, 50);
 }
 
-ReadStatus readFlatfile(
+typedef struct {
+    bool definingCategories;
+    Category * categories[MAX_CATEGORIES];
+    size_t categoryCount;
+
+    int currentRecordField;
+    ProductRecord * parsedRecord;
+} ParserState;
+
+bool stepParser(ParserState * state, char * line, void * catcher,
+                bool (*onCategory)(void *, Category *),
+                bool (*onRecord)(void *, ProductRecord *)) {
+    if(strncmp(line, "CAT ", 4) == 0) {
+        if(!state->definingCategories) {
+            printf("Category definitions are not consecutive and at start of file!");
+            return false;
+        }
+        if(state->categoryCount == MAX_CATEGORIES) {
+            printf("Too many product categories! Maximum is 100. (Sorry.)");
+            return false;
+        }
+        Category * newCategory = (state->categories[state->categoryCount] = malloc(sizeof(Category)));
+        newCategory->code = state->categoryCount;
+        strcpy(newCategory->name, line[4]);
+        onCategory(catcher, newCategory);
+        ++state->categoryCount;
+        return true;
+    }
+    state->definingCategories = false;
+}
+
+bool loadFlatfile(
     Filepath filepath, void * catcher,
     bool (*onCategory)(void *, Category *),
     bool (*onRecord)(void *, ProductRecord *)) {
     FILE * file = fopen(filepath, "r");
-    // TODO
+    if(file) {
+        ParserState state;
+        state.categoryCount = 0;
+        state.definingCategories = true;
+        state.currentRecordField = NULL;
+
+        char line[256];
+        while(fgets(line, 256, file)) {
+            if(!stepParser(&state, line, catcher, onCategory, onRecord))
+                return false;
+        }
+        fclose(file);
+        return true;
+    }
+
+    printf("Could not open file!\n");
+    return false;
 }
 
-ReadStatus readRandom(
+bool loadRandom(
     size_t categoryCount, size_t recordCount, void * catcher,
     bool (* onDefCategory)(void *, Category *),
     bool (* onDefRecord)(void *, ProductRecord *)) {
@@ -44,18 +91,38 @@ ReadStatus readRandom(
     }
     for(size_t i = 0; i <= recordCount; ++i) {
         ProductRecord * record = malloc(sizeof(ProductRecord));
-        randomRecord(record, &categories[randomIntRange(0, categories - 1)]);
+        randomRecord(record, &categories[randomIntRange(0, categoryCount - 1)]);
         onDefRecord(catcher, record);
     }
-    return READ_OK;
+    return true;
 }
 
-ReadStatus readDemo(void * catcher, bool (* onDefCategory)(Category *, void *), bool (* onDefRecord)(ProductRecord *, void *)) {
-
-}
-
-WriteStatus writeFlatfile(Filepath filepath, void * iterator, bool (popCategory)(void *, Category **), bool (popRecord)(void *, ProductRecord **)) {
-
+bool writeFlatfile(
+    Filepath filepath, void * iterator,
+    bool (popCategory)(void *, Category **),
+    bool (popRecord)(void *, ProductRecord **)) {
+    FILE * file = fopen(filepath, "w");
+    {
+        Category * category;
+        while(popCategory(iterator, &category)) {
+            fprintf(file, "CAT %s\n", category->name);
+        }
+    }
+    {
+        ProductRecord * record;
+        #define STRING "%s\n"
+        #define INT "%i\n"
+        while(popRecord(iterator, &record)) {
+            fprintf(STRING INT STRING INT INT,
+                record->id,
+                record->instances,
+                record->name,
+                record->price,
+                record->category->code);
+        }
+        #undef STRING
+        #undef INT
+    }
 }
 
 

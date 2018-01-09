@@ -25,7 +25,6 @@ void randomWordFixed(size_t length, char * str) {
     for (size_t i = 0; i < length; ++i)
         str[i] = (char) randomIntRange((int) 'a', (int) 'z');
     str[length] = '\0';
-    return str;
 }
 
 void randomWord(char * str) {
