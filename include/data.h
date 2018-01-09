@@ -13,6 +13,7 @@
 typedef char ProductID[PRODUCT_ID_LENGTH];
 
 typedef unsigned long int Price;
+#define FORMAT_PRICE "%i"
 typedef unsigned char CategoryCode;
 
 typedef struct {
@@ -35,14 +36,12 @@ void ppRecord(ProductRecord *);
 void randomRecord(ProductRecord *, Category *);
 
 // These methods have the responsibility of allocating the memory for Category and ProductRecord.
-// Of course, the responsibility of cleaning up falls on Catalog.
-
-// True is for success, as usual.
+// We guarantee that onDefCategory is called no more than MAX_CATEGORIES times, and no call to onDefRecord proceeds
+// a call to onDefCategory.
 bool loadFlatfile(
     Filepath filepath, void * reader,
     bool (*onDefCategory)(void *, Category *),
     bool (*onDefRecord)(void *, ProductRecord *));
-
 bool loadRandom(
     size_t categoryCount, size_t recordCount, void * catcher,
     bool (*onDefCategory)(void *, Category *),

@@ -34,8 +34,10 @@ bool onDefCategory_(void * ptr, Category * category) {
 bool onDefRecord_(void * ptr, ProductRecord * record) {
     Catalog * catalog = (Catalog *) ptr;
     dictAdd(catalog->byId, (void *) record->id, (void *) record);
-    olAdd(catalog->byName, (void *) record->name, (void *) record);
-    olAdd(catalog->byPrice, (void *) record->price, (void *) record);
+    for(size_t i = 0; i <= catalog->categoryCount; ++i) {
+        olAdd(catalog->byName[i], (void *) record->name, (void *) record);
+        olAdd(catalog->byPrice[i], (void *) record->price, (void *) record);
+    }
     ++catalog->totalRecords;
     catalog->totalInstances += record->instances;
     return true;
@@ -61,8 +63,11 @@ void newCatalogRandom(Catalog ** catalog, size_t categoryCount, size_t recordCou
 
 void freeCatalog(Catalog * catalog) {
     freeDictionary(catalog->byId);
-    freeOrderedList(catalog->byName);
-    freeOrderedList(catalog->byPrice);
+    for(size_t i = 0; i <= catalog->categoryCount; ++i) {
+
+        freeOrderedList(catalog->byName[i]);
+        freeOrderedList(catalog->byPrice[i]);
+    }
     freeOrderedList(catalog->categoryLeaderboard);
     for(size_t i = 0; i < catalog->categoryCount; ++i)
         free(catalog->categories[i]);
@@ -89,7 +94,7 @@ bool popRecord_(void * ptr, ProductID ** id, ProductRecord ** record) {
 void writeCatalog(Catalog * catalog, char * filepath) {
     CatalogIterator iterator;
     iterator.catalog = catalog;
-    iterator.head = olFirst(catalog->byName);
+    iterator.head = olFirst(catalog->byName[0]);
     iterator.categoryIndex = 0;
     writeFlatfile(filepath, (void *) &iterator, &popCategory_, &popRecord_);
 }

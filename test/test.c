@@ -78,6 +78,7 @@ void testDictionary() {
 void testRandomCatalog() {
     Catalog *catalog;
     newCatalogRandom(&catalog, 10, 1000);
+    writeCatalog(catalog, "data/random.txt");
     freeCatalog(catalog);
 }
 

@@ -7,6 +7,7 @@
 
 #include "util.h"
 
+// A >= B.
 typedef bool (* OrderingFunction)(void *, void *);
 
 typedef struct OrderedList OrderedList;
@@ -17,7 +18,7 @@ void freeOrderedList(OrderedList *);
 
 OLNode * olFirst(OrderedList *);
 OLNode * olLast(OrderedList *);
-OLNode * olSupremum(OrderedList *, void * key); // Gives last node with key >= to the key presented.
+OLNode * olSupremum(OrderedList *, void * key); // Gives first node with key >= to the key presented.
 OLNode * olSeekBy(OLNode *, size_t seeking);
 OLNode * olNext(OLNode *);
 OLNode * olPrev(OLNode *);
