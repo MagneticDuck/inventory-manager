@@ -10,6 +10,7 @@
 struct OrderedList {
     OrderingFunction ordering;
     OLNode * first, * last;
+    size_t size;
 };
 
 struct OLNode {
@@ -28,6 +29,10 @@ OrderedList * newOrderedList(OrderingFunction ordering) {
 void freeOrderedList(OrderedList * list) {
     while(list->first) olRemove(list, list->first);
     free(list);
+}
+
+size_t olSize(OrderedList *list) {
+    return list->size;
 }
 
 OLNode * olFirst(OrderedList * list) {
@@ -79,6 +84,7 @@ size_t olIndex(OLNode * node) {
 }
 
 void olInsertBefore_(OrderedList * list, OLNode * successor, OLNode * newNode) {
+    ++list->size;
     if(!successor) {
         if(list->last) list->last->next = newNode;
         else list->first = newNode;
@@ -112,6 +118,7 @@ OLNode * olAddWithoutDuplication(OrderedList * list, void * key, void * value) {
 }
 
 void olPluck_(OrderedList * list, OLNode * node) {
+    --list->size;
     if(node->prev) node->prev->next = node->next;
     else list->first = node->next;
     if(node->next) node->next->prev = node->prev;

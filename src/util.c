@@ -33,7 +33,7 @@ void randomWordFixed(size_t length, char * str) {
 }
 
 void randomWord(char * str) {
-    randomWordFixed(rand() % 7 + 5, str);
+    randomWordFixed(randomIntRange(5, MAX_STRING_LENGTH), str);
 }
 
 bool numericCompare(void* dataA, void* dataB) {

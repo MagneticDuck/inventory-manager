@@ -4,11 +4,14 @@
 #ifndef DICTIONARY_H_INCLUDED
 #define DICTIONARY_H_INCLUDED
 
+#include "util.h"
+
 typedef struct Dictionary Dictionary;
 typedef struct DictionaryEntry DictEntry;
 
 Dictionary * newDictionary();
 void freeDictionary(Dictionary *);
+size_t dictSize(Dictionary *);
 
 DictEntry * dictLookup(Dictionary *, char * key);
 DictEntry * dictAdd(Dictionary *, char * key, void * value); // Returns NULL if key is already in dictionary.

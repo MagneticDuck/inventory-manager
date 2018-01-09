@@ -34,6 +34,11 @@ void freeDictionary(Dictionary * dictionary) {
     free(dictionary);
 }
 
+size_t dictSize(Dictionary *dictionary) {
+    return olSize(dictionary->list);
+}
+
+
 DictionaryEntry * dictLookup(Dictionary * dictionary, char * key) {
     OLNode * closest = olSupremum(dictionary->list, key);
     if (closest && 0 == strcmp((char *) olKey(closest), key)) return *olValue(closest);

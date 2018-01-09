@@ -15,6 +15,7 @@ typedef struct OLNode OLNode;
 
 OrderedList * newOrderedList(OrderingFunction ordering);
 void freeOrderedList(OrderedList *);
+size_t olSize(OrderedList *);
 
 OLNode * olFirst(OrderedList *);
 OLNode * olLast(OrderedList *);

@@ -16,7 +16,7 @@ typedef struct {
     char * name;
     CategoryCode code;
     OLNode * byValue;
-    Price netPrice;
+    Price netValue;
 } CategoryEntry;
 
 void freeCategoryEntry_(CategoryEntry * entry) {
@@ -42,33 +42,41 @@ typedef struct Catalog {
     OrderedList * productsByPrice[MAX_CATEGORIES + 1];
 } Catalog;
 
+CategoryEntry * catCategoryEntry_(Catalog * catalog, CategoryCode code) {
+    return (CategoryEntry *) arrayAccess(catalog->categoriesByCode, code);
+}
+
 void catSortCategories_(Catalog * catalog) {
     if (catalog->categoriesByValue) freeOrderedList(catalog->categoriesByValue);
     // TODO
 }
 
-// Deinitialize
 void catUnsortCategories_(Catalog * catalog) {
     if (catalog->categoriesByValue) freeOrderedList(catalog->categoriesByValue);
     catalog->categoriesByValue = NULL;
 }
 
-bool onDefCategory_(void * ptr, char * name) {
+bool onReadCategory_(void * ptr, char * name) {
     Catalog * catalog = (Catalog *) ptr;
 
     CategoryEntry * entry = malloc(sizeof(CategoryEntry));
     entry->name = name;
     entry->code = arrayAppend(catalog->categoriesByCode, entry);
-    entry->netPrice = 0;
-    olAdd(catalog->categoriesByValue, (void *) &entry->netPrice, (void *) entry);
+    entry->netValue = 0;
+    olAdd(catalog->categoriesByValue, (void *) &entry->netValue, (void *) entry);
 
     catalog->productsByName[catCategoryCount(catalog) + 1] = newOrderedList(&lexiographicCompare);
     catalog->productsByPrice[catCategoryCount(catalog) + 1] = newOrderedList(&priceCompare);
     return true;
 }
 
-bool onDefRecord_(void * ptr, ProductRecord * record) {
+bool onReadRecord_(void * ptr, ProductRecord * record) {
     Catalog * catalog = (Catalog *) ptr;
+
+    if (record->category > catCategoryCount(catalog)) {
+        printf("Category code out of bounds!\n");
+        return false;
+    }
 
     // Add record to all the structures.
     dictAdd(catalog->productsById, (void *) record->id, (void *) record);
@@ -79,8 +87,8 @@ bool onDefRecord_(void * ptr, ProductRecord * record) {
 
     // Update category net value and reindex in list.
     CategoryEntry * entry = (CategoryEntry *) arrayAccess(catalog->categoriesByCode, record->category);
-    entry->netPrice += record->price * record->instances;
-    olReindex(catalog->categoriesByValue, &entry->netPrice, entry);
+    entry->netValue += record->price * record->instances;
+    olReindex(catalog->categoriesByValue, &entry->netValue, entry);
     return true;
 }
 
@@ -98,12 +106,12 @@ void newEmptyCatalog(Catalog ** catalog) {
 
 bool newCatalogFromFile(Catalog ** catalog, Filepath filepath) {
     newEmptyCatalog(catalog);
-    return readCatalogFile(filepath, (void *) *catalog, &onDefCategory_, &onDefRecord_);
+    return readCatalogFile(filepath, (void *) *catalog, &onReadCategory_, &onReadRecord_);
 }
 
 void newCatalogRandom(Catalog ** catalog, size_t categoryCount, size_t recordCount) {
     newEmptyCatalog(catalog);
-    readRandomCatalog(categoryCount, recordCount, (void *) *catalog, &onDefCategory_, &onDefRecord_);
+    readRandomCatalog(categoryCount, recordCount, (void *) *catalog, &onReadCategory_, &onReadRecord_);
 }
 
 void freeCatalog(Catalog * catalog) {
@@ -112,9 +120,9 @@ void freeCatalog(Catalog * catalog) {
         freeOrderedList(catalog->productsByName[i]);
         freeOrderedList(catalog->productsByPrice[i]);
     }
-    if (catalog->categoriesByValue) olFree(catalog->categoriesByValue);
-    for(size_t i = 0; i < catalog->categoryCount; ++i)
-        freeCategoryEntry(arrayAccess(catalog->categoriesByCode, i));
+    if (catalog->categoriesByValue) freeOrderedList(catalog->categoriesByValue);
+    for(size_t i = 0; i < catCategoryCount(catalog); ++i)
+        freeCategoryEntry_(arrayAccess(catalog->categoriesByCode, i));
     freeArray(catalog->categoriesByCode);
     free(catalog);
 }
@@ -125,10 +133,10 @@ typedef struct {
     ProductEntry * head;
 } CatalogIterator;
 
-bool popCategory_(void * ptr, Category ** category) {
+bool popCategory_(void * ptr, char ** name) {
     CatalogIterator * iterator = (CatalogIterator *) ptr;
-    if(iterator->categoryIndex > iterator->catalog->categoryCount) return false;
-    *category = iterator->catalog->categories[iterator->catalog->categoryCount++];
+    if(iterator->categoryIndex >= catCategoryCount(iterator->catalog)) return false;
+    name = catCategoryEntry_(iterator->catalog, iterator->categoryIndex)->name;
     return true;
 }
 
@@ -156,23 +164,21 @@ CategoryCode catCategoryCount(Catalog *catalog) {
     return arraySize(catalog->categoriesByCode);
 }
 
-CategoryEntry * catCategoryEntry(Catalog * catalog, CategoryCode code) {
-    return (CategoryEntry *) arrayAccess(catalog->categoriesByCode, code);
+char * catCategoryName(Catalog *catalog, CategoryCode code) {
+    return catCategoryEntry_(catalog, code)->name;
 }
 
-char catCategoryName(Catalog *catalog, CategoryCode code) {
-    return catCategoryEntry(catalog, code).category.name;
+Price catCategoryValue(Catalog *catalog, CategoryCode code) {
+    return catCategoryEntry_(catalog, code)->netValue;
 }
 
-Price catCategoryValue(Catalog *, CategoryCode) {
-
+CategoryCode catCategoryByRank(Catalog *catalog, size_t place) {
+    catSortCategories_(catalog);
+    OLNode * seeked = olSeekBy(olFirst(catalog->categoriesByValue), place);
+    return ((CategoryEntry *) olValue(seeked))->code;
 }
 
-CategoryCode catCategoryByRank(Catalog *, size_t place) {
-
-}
-
-ProductEntry * catLookupProduct(Catalog * catalog, ProductID id) {
+ProductEntry * catLookupProduct(Catalog * catalog, ProductId id) {
     return (ProductEntry *) dictValue(dictLookup(catalog->productsById, id));
 }
 
@@ -182,9 +188,9 @@ ProductRecord * catProductRecord(ProductEntry * product) {
 
 void catRemove(Catalog * catalog, ProductEntry * entry) {
     dictRemove(catalog->productsById, entry->byId);
-    for(size_t i = 0; i <= catalog->categoryCount; ++i) {
-        olRemove(catalog->byName[i], entry->byName[i]);
-        olRemove(catalog->byPrice[i], entry->byPrice[i]);
+    for(size_t i = 0; i <= catCategoryCount(catalog); ++i) {
+        olRemove(catalog->productsByName[i], entry->byName[i]);
+        olRemove(catalog->productsByPrice[i], entry->byPrice[i]);
     }
 }
 
@@ -198,8 +204,8 @@ OLNode * getRelevantNode_(ProductEntry * entry, ListingConfig * config) {
 
 OrderedList * getRelevantList_(Catalog * catalog, ListingConfig * config) {
     OrderedList ** index;
-    if(config->orderAlphabetical) index = catalog->byName;
-    else index = catalog->byPrice;
+    if(config->orderAlphabetical) index = catalog->productsByName;
+    else index = catalog->productsByPrice;
     if(!config->useFilter) return index[0];
     else return index[config->categoryFilter + 1];
 }
@@ -226,18 +232,18 @@ ProductEntry * catPrev(Catalog * catalog, ListingConfig * config, ProductEntry *
 
 ProductEntry * catAlphabeticalSupremum(Catalog * catalog, ListingConfig * config, char * prefix) {
     OrderedList * relevant;
-    if(!config->useFilter) relevant = catalog->byName[0];
-    else relevant = catalog->byName[config->categoryFilter + 1];
+    if(!config->useFilter) relevant = catalog->productsByName[0];
+    else relevant = catalog->productsByName[config->categoryFilter + 1];
     return (ProductEntry *) olValue(olSupremum(relevant, prefix));
 }
 
 ProductEntry * catPriceSupremum(Catalog * catalog, ListingConfig * config, Price price) {
     OrderedList * relevant;
-    if(!config->useFilter) relevant = catalog->byPrice[0];
-    else relevant = catalog->byPrice[config->categoryFilter + 1];
+    if(!config->useFilter) relevant = catalog->productsByPrice[0];
+    else relevant = catalog->productsByPrice[config->categoryFilter + 1];
     return (ProductEntry *) olValue(olSupremum(relevant, (void *) price));
 }
 
-ProductEntry * catLookup(Catalog * catalog, ListingConfig * config, ProductID id) {
+ProductEntry * catLookup(Catalog * catalog, ListingConfig * config, ProductId id) {
     return (ProductEntry *) dictValue(dictLookup(catalog->productsById, id));
 }

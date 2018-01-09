@@ -9,7 +9,9 @@ typedef struct {
 } ListingState;
 
 void printEntry(ListingState * state, ProductEntry * entry) {
-    ppRecord(catProductRecord(entry));
+    ProductRecord * record = catProductRecord(entry);
+    printf("%s, category %s", record->name,
+        catCategoryName(state->catalog, record->category));
 }
 
 void displayListing(ListingState * state) {
