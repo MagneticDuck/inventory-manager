@@ -27,8 +27,8 @@ void freeCategoryEntry_(CategoryEntry * entry) {
 typedef struct ProductEntry {
     ProductRecord * record;
     DictEntry * byId;
-    OLNode * byName[MAX_CATEGORIES + 1];
-    OLNode * byPrice[MAX_CATEGORIES + 1];
+    OLNode * byName[2];
+    OLNode * byPrice[2];
 } ProductEntry;
 
 typedef struct Catalog {
@@ -59,11 +59,15 @@ void catUnsortCategories_(Catalog * catalog) {
 bool onReadCategory_(void * ptr, char * name) {
     Catalog * catalog = (Catalog *) ptr;
 
+    // Make entry.
     CategoryEntry * entry = malloc(sizeof(CategoryEntry));
     entry->name = name;
-    entry->code = arrayAppend(catalog->categoriesByCode, entry);
     entry->netValue = 0;
 
+    // Add entry to indexing structure.
+    entry->code = arrayAppend(catalog->categoriesByCode, entry);
+
+    // Create indexing structures for products in this category.
     catalog->productsByName[entry->code + 1] = newOrderedList(&lexiographicCompare);
     catalog->productsByPrice[entry->code + 1] = newOrderedList(&priceCompare);
     return true;
@@ -77,20 +81,24 @@ bool onReadRecord_(void * ptr, ProductRecord * record) {
         return false;
     }
 
-    // Add record to all the structures.
-    dictAdd(catalog->productsById, (void *) record->id, (void *) record);
-    olAdd(catalog->productsByName[0], (void *) record->name, (void *) record);
-    olAdd(catalog->productsByPrice[0], (void *) &record->price, (void *) record);
-    olAdd(catalog->productsByName[record->category + 1], (void *) record->name, (void *) record);
-    olAdd(catalog->productsByPrice[record->category + 1], (void *) &record->price, (void *) record);
+    // Make entry.
+    ProductEntry * entry = malloc(sizeof(ProductEntry));
+    entry->record = record;
 
-    // Update category net value and reindex in list.
-    CategoryEntry * entry = (CategoryEntry *) arrayAccess(catalog->categoriesByCode, record->category);
-    entry->netValue += record->price * record->instances;
+    // Add entry to all the structures.
+    entry->byId = dictAdd(catalog->productsById, (void *) record->id, (void *) entry);
+    entry->byName[0] = olAdd(catalog->productsByName[0], (void *) record->name, (void *) entry);
+    entry->byPrice[0] = olAdd(catalog->productsByPrice[0], (void *) &record->price, (void *) entry);
+    entry->byName[1] = olAdd(catalog->productsByName[record->category + 1], (void *) record->name, (void *) entry);
+    entry->byPrice[1] = olAdd(catalog->productsByPrice[record->category + 1], (void *) &record->price, (void *) entry);
+
+    // Update category net value.
+    CategoryEntry * catEntry = catCategoryEntry_(catalog, record->category);
+    catEntry->netValue += record->price * record->instances;
     return true;
 }
 
-void newEmptyCatalog(Catalog ** catalog) {
+void newCatalog_(Catalog ** catalog) {
     *catalog = malloc(sizeof(Catalog));
     Catalog * catalog_ = *catalog;
 
@@ -103,12 +111,12 @@ void newEmptyCatalog(Catalog ** catalog) {
 }
 
 bool newCatalogFromFile(Catalog ** catalog, Filepath filepath) {
-    newEmptyCatalog(catalog);
+    newCatalog_(catalog);
     return readCatalogFile(filepath, (void *) *catalog, &onReadCategory_, &onReadRecord_);
 }
 
 void newCatalogRandom(Catalog ** catalog, size_t categoryCount, size_t recordCount) {
-    newEmptyCatalog(catalog);
+    newCatalog_(catalog);
     readRandomCatalog(categoryCount, recordCount, (void *) *catalog, &onReadCategory_, &onReadRecord_);
 }
 
@@ -134,7 +142,7 @@ typedef struct {
 bool popCategory_(void * ptr, char ** name) {
     CatalogIterator * iterator = (CatalogIterator *) ptr;
     if(iterator->categoryIndex >= catCategoryCount(iterator->catalog)) return false;
-    *name = catCategoryEntry_(iterator->catalog, iterator->categoryIndex)->name;
+    *name = catCategoryEntry_(iterator->catalog, iterator->categoryIndex++)->name;
     return true;
 }
 
@@ -196,8 +204,8 @@ OLNode * getRelevantNode_(ProductEntry * entry, ListingConfig * config) {
     OLNode ** index;
     if(config->orderAlphabetical) index = entry->byName;
     else index = entry->byPrice;
-    if(!config->useFilter) return index[0];
-    else return index[config->categoryFilter + 1];
+    if(config->useFilter) return index[1];
+    else return index[0];
 }
 
 OrderedList * getRelevantList_(Catalog * catalog, ListingConfig * config) {

@@ -15,7 +15,6 @@ typedef struct Catalog Catalog;
 // Lifetime management and file IO.
 
 bool newCatalogFromFile(Catalog ** catalog, Filepath filepath);
-void newEmptyCatalog(Catalog ** catalog);
 void newCatalogRandom(Catalog ** catalog, size_t categories, size_t records);
 void freeCatalog(Catalog *);
 

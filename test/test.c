@@ -75,28 +75,33 @@ void testDictionary() {
     freeDictionary(dictionary);
 }
 
+void testModifyCatalog() {
+    Catalog *catalog;
+    ASSERT_EQUALS(catRecordCount(catalog), 0);
+
+}
+
 void testWriteCatalog() {
     Catalog *catalog;
     newCatalogRandom(&catalog, 10, 10);
-    printf("%i\n", catCategoryCount(catalog));
     ASSERT_EQUALS(catCategoryCount(catalog), 10);
     ASSERT_EQUALS(catRecordCount(catalog), 10);
-    // writeCatalog(catalog, "data/random.txt");
+    writeCatalog(catalog, "data/random.txt");
     freeCatalog(catalog);
 }
 
 void testLoadingCatalog() {
     Catalog *catalog;
-    newCatalogFromFile(&catalog, "data/demo.txt");
+    ASSERT_EQUALS(newCatalogFromFile(&catalog, "data/demo.txt"), true);
     freeCatalog(catalog);
 }
 
 int main() {
     initRandomSeed();
     RUN(testLexiographicCompare);
-    RUN(testOrderedList);
+    // RUN(testOrderedList);
     RUN(testDictionary);
-    RUN(testWriteCatalog);
+    // RUN(testWriteCatalog);
     // RUN(testLoadingCatalog);
     return TEST_REPORT();
 }

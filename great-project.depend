@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1515514455 source:/home/magneticduck/git/great-project/test/test.c
+1515514726 source:/home/magneticduck/git/great-project/test/test.c
 	"tinytest.h"
 	"util.h"
 	"data.h"
@@ -21,7 +21,7 @@
 1515420303 /home/magneticduck/git/great-project/include/algorithms/ordered_list.h
 	"util.h"
 
-1515513707 source:/home/magneticduck/git/great-project/src/data.c
+1515514502 source:/home/magneticduck/git/great-project/src/data.c
 	"data.h"
 
 1515513542 /home/magneticduck/git/great-project/include/data.h
@@ -36,14 +36,14 @@
 	"util.h"
 	"data.h"
 
-1515514416 source:/home/magneticduck/git/great-project/src/catalog.c
+1515516072 source:/home/magneticduck/git/great-project/src/catalog.c
 	"array.h"
 	"catalog.h"
 	"dictionary.h"
 	"ordered_list.h"
 	"data.h"
 
-1515509164 /home/magneticduck/git/great-project/include/catalog.h
+1515516244 /home/magneticduck/git/great-project/include/catalog.h
 	<stdio.h>
 	"data.h"
 	"util.h"
