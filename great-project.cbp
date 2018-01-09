@@ -45,34 +45,37 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="include/array.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
 		<Unit filename="include/catalog.h">
-			<Option target="&lt;{~None~}&gt;" />
-		</Unit>
-		<Unit filename="include/ordered_list.h">
-			<Option target="&lt;{~None~}&gt;" />
-		</Unit>
-		<Unit filename="include/dictionary.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="include/data.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
+		<Unit filename="include/dictionary.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
 		<Unit filename="include/listing_ui.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="include/ordered_list.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="include/util.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
-		<Unit filename="src/dictionary.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="src/ordered_list.c">
+		<Unit filename="src/array.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/catalog.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/data.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/dictionary.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/listing_ui.c">
@@ -82,6 +85,9 @@
 			<Option compilerVar="CC" />
 			<Option target="Release" />
 			<Option target="Debug" />
+		</Unit>
+		<Unit filename="src/ordered_list.c">
+			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/util.c">
 			<Option compilerVar="CC" />

@@ -16,8 +16,8 @@ typedef char * Filepath;
 void unimplemented(void);
 
 // Comparisons. A <= B.
-bool lexiographicCompare(void * ptrA, void * ptrB);
-bool numericCompare(void * dataA, void * dataB); // we can use user-data to store values
+bool lexiographicCompare(void * ptrA, void * ptrB); // Pointers to char.
+bool priceCompare(void * dataA, void * dataB); // Pointers to Price.
 
 // Random.
 void initRandomSeed();

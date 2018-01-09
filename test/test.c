@@ -37,6 +37,7 @@ void testOrderedList() {
     ASSERT_EQUALS(olIndex(nodes[3]), 0);
     ASSERT_EQUALS(olIndex(nodes[2]), 1);
     ASSERT_EQUALS(olIndex(nodes[0]), 2);
+    ASSERT_EQUALS(olPrev(nodes[1]), nodes[0]);
     ASSERT_EQUALS(olIndex(nodes[1]), 3);
 
     ASSERT_EQUALS(olNext(nodes[1]), nodes[3]);

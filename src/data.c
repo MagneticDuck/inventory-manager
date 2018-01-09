@@ -1,29 +1,10 @@
 #include "data.h"
 
-void randomProductID(ProductID id) {
-    randomWordFixed(PRODUCT_ID_LENGTH - 1, id);
-}
-
-void ppCategory(Category * category) {
-    printf("%s (%i)\n", category->name, category->code);
-}
-
-void randomCategory(Category * category, unsigned char code) {
-    randomWord(category->name);
-    category->code = code;
-}
 
 void ppRecord(ProductRecord * record) {
     printf("%s | " FORMAT_PRICE " | %s", record->name, record->price, record->category->name);
 }
 
-void randomRecord(ProductRecord * record, Category * category) {
-    randomWord(record->name);
-    randomProductID(record->id);
-    record->category = category;
-    record->price = randomIntRange(0, 10000);
-    record->instances = randomIntRange(1, 50);
-}
 
 typedef struct {
     size_t lineNumber;
@@ -131,18 +112,30 @@ bool readCatalogFile(
     return loadFile_(filepath, catcher, true, onReadCategory, onReadRecord);
 }
 
+void randomProductID_(ProductID id) {
+    randomWordFixed(PRODUCT_ID_LENGTH - 1, id);
+}
+
+void randomRecord_(ProductRecord * record, CategoryCode categoryCount) {
+    randomWord(record->name);
+    randomProductID(record->id);
+    record->category = randomIntRange(0, categoryCount);
+    record->price = randomIntRange(0, 10000);
+    record->instances = randomIntRange(1, 50);
+}
+
 bool readRandomCatalog(
     size_t categoryCount, size_t recordCount, void * catcher,
     bool (* onReadCategory)(void *, Category *),
     bool (* onReadRecord)(void *, ProductRecord *)) {
-    Category * categories = malloc(sizeof(Category) * categoryCount);
+    Category ** categories = malloc(sizeof(char) * categoryCount);
     for(size_t i = 0; i <= categoryCount; ++i) {
-        randomCategory(&categories[i], i);
-        onReadCategory(catcher, &categories[i]);
+        randomWord(categories[i]);
+        onReadCategory(catcher, categories[i]);
     }
     for(size_t i = 0; i <= recordCount; ++i) {
         ProductRecord * record = malloc(sizeof(ProductRecord));
-        randomRecord(record, &categories[randomIntRange(0, categoryCount - 1)]);
+        randomRecord(record, categoryCount);
         onReadRecord(catcher, record);
     }
     return true;
@@ -162,6 +155,7 @@ bool writeFile(
     {
         Category * category;
         while(popCategory(iterator, &category)) {
+            printf("writing category %s\n", category->name);
             fprintf(file, "CAT %s\n", category->name);
         }
     }

@@ -65,9 +65,6 @@ void ** dictValue(DictionaryEntry * entry) {
 
 #else
 
-#define BIN_BITS 16
-#include "util.h"
-
-// When SIMPLE_DICTIONARY is disabled, we use a hashmap with 2^BIN_BITS bins.
+#error "Hashmap dictionaries are not yet implemented."
 
 #endif

@@ -12,12 +12,6 @@
 typedef struct ProductEntry ProductEntry;
 typedef struct Catalog Catalog;
 
-typedef struct {
-    Price netPrice;
-    size_t recordCount;
-    size_t totalInstances;
-} CategoryStats;
-
 // Lifetime management and file IO.
 
 bool newCatalogFromFile(Catalog ** catalog, Filepath filepath);
@@ -29,17 +23,15 @@ void writeCatalog(Catalog * catalog, char * filepath);
 
 // Basic queries.
 
-size_t catTotalRecords(Catalog *);
-size_t catTotalInstances(Catalog *);
-
+size_t catRecordCount(Catalog *);
 CategoryCode catCategoryCount(Catalog *);
 char * catCategoryName(Catalog *, CategoryCode);
-CategoryStats * catCategoryStats(Catalog *, CategoryCode);
+Price catCategoryValue(Catalog *, CategoryCode);
 CategoryCode catCategoryByRank(Catalog *, size_t place);
 
 // Accessing and modifying records.
 
-ProductEntry * catLookupProduct(Catalog * catalog, ProductID * id);
+ProductEntry * catLookupProduct(Catalog * catalog, ProductId id);
 ProductRecord * catProductRecord(ProductEntry * product);
 void catRemove(Catalog *, ProductEntry *);
 
@@ -60,7 +52,6 @@ ProductEntry * catSeekBy(Catalog *, ListingConfig *, ProductEntry *, size_t seek
 ProductEntry * catPrev(Catalog *, ListingConfig *, ProductEntry *);
 
 ProductEntry * catAlphabeticalSupremum(Catalog *, ListingConfig * config, char * prefix);
-ProductEntry * catPriceSupremum(Catalog *, ListingConfig * config, int price);
-ProductEntry * catLookup(Catalog *, ListingConfig * config, ProductID id);
+ProductEntry * catPriceSupremum(Catalog *, ListingConfig * config, Price price);
 
 #endif // CATALOG_H_INCLUDED

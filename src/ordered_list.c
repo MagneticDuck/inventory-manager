@@ -132,6 +132,6 @@ void olRemove(OrderedList * list, OLNode * node) {
 
 #else
 
-// When SIMPLE_ORDERED_LIST is disabled, we use a stochastically balanced tree-like data structure called a skiplist.
+#error "The skiplist implementation of OrderedList is not yet implemented."
 
 #endif

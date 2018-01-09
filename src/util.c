@@ -1,4 +1,5 @@
 #include "util.h"
+#include "data.h"
 
 void unimplemented(void) {
     printf("asjdfjslkdjflkdsa");
@@ -11,6 +12,10 @@ bool lexiographicCompare(void * ptrA, void * ptrB) {
         if(!strB[i]) return 0;
         if(strA[i] != strB[i]) return strA[i] <= strB[i];
     }
+}
+
+bool priceCompare(void * ptrA, void * ptrB) {
+    return *((Price *) ptrA) <= *((Price *) ptrB);
 }
 
 void initRandomSeed() {

@@ -6,10 +6,5 @@ void main(void) {
     newCatalogRandom(&catalog, 10, 1000);
     freeCatalog(catalog);
 
-    ListingConfig config;
-    config.categoryFilter = 0;
-    config.useFilter = false;
-    config.orderAlphabetical = true;
-
-    interactListing(catalog, &config);
+    interactListing(catalog, NULL_CONFIG());
 }
