@@ -63,10 +63,11 @@ bool onReadCategory_(void * ptr, char * name) {
     entry->name = name;
     entry->code = arrayAppend(catalog->categoriesByCode, entry);
     entry->netValue = 0;
-    olAdd(catalog->categoriesByValue, (void *) &entry->netValue, (void *) entry);
 
-    catalog->productsByName[catCategoryCount(catalog) + 1] = newOrderedList(&lexiographicCompare);
-    catalog->productsByPrice[catCategoryCount(catalog) + 1] = newOrderedList(&priceCompare);
+    printf("Initialized category %i...\n", entry->code);
+
+    catalog->productsByName[entry->code + 1] = newOrderedList(&lexiographicCompare);
+    catalog->productsByPrice[entry->code + 1] = newOrderedList(&priceCompare);
     return true;
 }
 
@@ -78,17 +79,18 @@ bool onReadRecord_(void * ptr, ProductRecord * record) {
         return false;
     }
 
+    printf("Accessing category %i...\n", record->category);
+
     // Add record to all the structures.
     dictAdd(catalog->productsById, (void *) record->id, (void *) record);
     olAdd(catalog->productsByName[0], (void *) record->name, (void *) record);
     olAdd(catalog->productsByPrice[0], (void *) &record->price, (void *) record);
-    olAdd(catalog->productsByName[record->category], (void *) record->name, (void *) record);
-    olAdd(catalog->productsByPrice[record->category], (void *) &record->price, (void *) record);
+    olAdd(catalog->productsByName[record->category + 1], (void *) record->name, (void *) record);
+    olAdd(catalog->productsByPrice[record->category + 1], (void *) &record->price, (void *) record);
 
     // Update category net value and reindex in list.
     CategoryEntry * entry = (CategoryEntry *) arrayAccess(catalog->categoriesByCode, record->category);
     entry->netValue += record->price * record->instances;
-    olReindex(catalog->categoriesByValue, &entry->netValue, entry);
     return true;
 }
 
@@ -97,7 +99,7 @@ void newEmptyCatalog(Catalog ** catalog) {
     Catalog * catalog_ = *catalog;
 
     catalog_->categoriesByCode = newArray(MAX_CATEGORIES);
-    catalog_->categoriesByValue = newOrderedList(&priceCompare);
+    catalog_->categoriesByValue = NULL;
 
     catalog_->productsById = newDictionary();
     catalog_->productsByName[0] = newOrderedList(&lexiographicCompare);

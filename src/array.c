@@ -9,6 +9,7 @@ Array * newArray(size_t maxSize) {
     Array * array = malloc(sizeof(Array));
     array->elements = malloc(sizeof(void *) * maxSize);
     array->size = 0;
+    return array;
 }
 
 void freeArray(Array * array) {

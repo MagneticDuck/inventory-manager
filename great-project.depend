@@ -36,7 +36,7 @@
 	"util.h"
 	"data.h"
 
-1515509990 source:/home/magneticduck/git/great-project/src/catalog.c
+1515511325 source:/home/magneticduck/git/great-project/src/catalog.c
 	"array.h"
 	"catalog.h"
 	"dictionary.h"
@@ -55,7 +55,7 @@
 
 1515344679 /home/magneticduck/git/great-project/include/algorithms/dictionary.h
 
-1515458221 source:/home/magneticduck/git/great-project/src/listing_ui.c
+1515510013 source:/home/magneticduck/git/great-project/src/listing_ui.c
 	"data.h"
 	"catalog.h"
 
@@ -80,7 +80,7 @@
 1515418299 /home/magneticduck/git/great-project/include/listing_ui.h
 	"catalog.h"
 
-1515505082 source:/home/magneticduck/git/great-project/src/array.c
+1515511152 source:/home/magneticduck/git/great-project/src/array.c
 	"array.h"
 
 1515506280 /home/magneticduck/git/great-project/include/array.h

@@ -151,6 +151,3 @@ bool writeFile(
 #undef INT
     }
 }
-
-
-
