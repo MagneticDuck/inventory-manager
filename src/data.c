@@ -10,7 +10,6 @@ typedef struct {
 
 // Sanitize maybe?
 bool readString(size_t lineNumber, char * dest, char * line) {
-    unimplemented();
 }
 
 // Return true if things went well, otherwise display a message with lineNumber and return false.
@@ -68,24 +67,23 @@ bool loadFile_(
     bool (*onCategory)(void *, char *),
     bool (*onRecord)(void *, ProductRecord *)) {
     FILE * file = fopen(filepath, "r");
-    if(file) {
-        ParserState state;
-        state.lineNumber = 0;
-        state.definingCategories = expectCategories;
-        state.currentRecordField = 0;
-        state.parsedRecord = NULL;
-
-        char line[256];
-        while(fgets(line, 256, file)) {
-            if(!stepParser(&state, line, catcher, onCategory, onRecord))
-                return false;
-        }
-        fclose(file);
-        return true;
+    if(!file) {
+        printf("Could not open file!\n");
+        return false;
     }
+    ParserState state;
+    state.lineNumber = 0;
+    state.definingCategories = expectCategories;
+    state.currentRecordField = 0;
+    state.parsedRecord = NULL;
 
-    printf("Could not open file!\n");
-    return false;
+    char line[256];
+    while(fgets(line, 256, file)) {
+        if(!stepParser(&state, line, catcher, onCategory, onRecord))
+            return false;
+    }
+    fclose(file);
+    return true;
 }
 
 bool readCatalogFile(
@@ -131,7 +129,7 @@ bool writeFile(
     bool (popCategory)(void *, char **),
     bool (popRecord)(void *, ProductRecord **)) {
     FILE * file = fopen(filepath, "w");
-    if (!file) {
+    if(!file) {
         printf("Could not open file for writing!");
         return false;
     }

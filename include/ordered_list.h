@@ -20,7 +20,7 @@ size_t olSize(OrderedList *);
 OLNode * olFirst(OrderedList *);
 OLNode * olLast(OrderedList *);
 OLNode * olSupremum(OrderedList *, void * key); // Gives first node with key >= to the key presented.
-OLNode * olSeekBy(OLNode *, size_t seeking);
+OLNode * olSeekBy(OLNode *, int seeking);
 OLNode * olNext(OLNode *);
 OLNode * olPrev(OLNode *);
 

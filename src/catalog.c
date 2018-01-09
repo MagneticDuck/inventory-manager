@@ -93,8 +93,6 @@ bool onReadRecord_(void * ptr, ProductRecord * record) {
     entry->byName[1] = olAdd(catalog->productsByName[record->category + 1], (void *) record->name, (void *) entry);
     entry->byPrice[1] = olAdd(catalog->productsByPrice[record->category + 1], (void *) &record->price, (void *) entry);
 
-    printf("name: %s\n", entry->record->name);
-
     // Update category net value.
     CategoryEntry * catEntry = catCategoryEntry_(catalog, record->category);
     catEntry->netValue += record->price * record->instances;
@@ -153,7 +151,6 @@ bool popRecord_(void * ptr, ProductRecord ** record) {
     CatalogIterator * iterator = (CatalogIterator *) ptr;
     if(!iterator->head) return false;
     *record = catProductRecord(iterator->head);
-    printf("popping record with name %s, incrementing...\n", (*record)->name);
     iterator->head = catNext(iterator->catalog, NULL_CONFIG(), iterator->head);
     return true;
 }
@@ -232,7 +229,7 @@ ProductEntry * catNext(Catalog * catalog, ListingConfig * config, ProductEntry *
     return (ProductEntry *) olValue(olNext(getRelevantNode_(entry, config)));
 }
 
-ProductEntry * catSeekBy(Catalog * catalog, ListingConfig * config, ProductEntry * entry, size_t seeking) {
+ProductEntry * catSeekBy(Catalog * catalog, ListingConfig * config, ProductEntry * entry, int seeking) {
     return (ProductEntry *) olValue(olSeekBy(getRelevantNode_(entry, config), seeking));
 }
 

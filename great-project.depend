@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1515523967 source:/home/magneticduck/git/great-project/test/test.c
+1515527764 source:/home/magneticduck/git/great-project/test/test.c
 	"tinytest.h"
 	"util.h"
 	"data.h"
@@ -21,7 +21,7 @@
 1515420303 /home/magneticduck/git/great-project/include/algorithms/ordered_list.h
 	"util.h"
 
-1515520676 source:/home/magneticduck/git/great-project/src/data.c
+1515526438 source:/home/magneticduck/git/great-project/src/data.c
 	"data.h"
 
 1515513542 /home/magneticduck/git/great-project/include/data.h
@@ -36,14 +36,14 @@
 	"util.h"
 	"data.h"
 
-1515524393 source:/home/magneticduck/git/great-project/src/catalog.c
+1515527867 source:/home/magneticduck/git/great-project/src/catalog.c
 	"array.h"
 	"catalog.h"
 	"dictionary.h"
 	"ordered_list.h"
 	"data.h"
 
-1515521557 /home/magneticduck/git/great-project/include/catalog.h
+1515527879 /home/magneticduck/git/great-project/include/catalog.h
 	<stdio.h>
 	"data.h"
 	"util.h"
@@ -57,25 +57,27 @@
 
 1515344679 /home/magneticduck/git/great-project/include/algorithms/dictionary.h
 
-1515510013 source:/home/magneticduck/git/great-project/src/listing_ui.c
+1515527995 source:/home/magneticduck/git/great-project/src/listing_ui.c
 	"data.h"
 	"catalog.h"
+	"util.h"
+	<stdio.h>
 
 1515524190 /home/magneticduck/git/great-project/include/dictionary.h
 	"util.h"
 
-1515524457 /home/magneticduck/git/great-project/include/ordered_list.h
+1515527847 /home/magneticduck/git/great-project/include/ordered_list.h
 	"util.h"
 
 1515524488 source:/home/magneticduck/git/great-project/src/dictionary.c
 	"dictionary.h"
 	"ordered_list.h"
 
-1515524482 source:/home/magneticduck/git/great-project/src/ordered_list.c
+1515527919 source:/home/magneticduck/git/great-project/src/ordered_list.c
 	"util.h"
 	"ordered_list.h"
 
-1515513122 source:/home/magneticduck/git/great-project/src/main.c
+1515528126 source:/home/magneticduck/git/great-project/src/main.c
 	"listing_ui.h"
 	"catalog.h"
 

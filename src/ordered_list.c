@@ -32,7 +32,7 @@ void freeOrderedList(OrderedList * list) {
     free(list);
 }
 
-size_t olSize(OrderedList *list) {
+size_t olSize(OrderedList * list) {
     return list->size;
 }
 
@@ -53,11 +53,16 @@ OLNode * olSupremum(OrderedList * list, void * key) {
     }
 }
 
-OLNode * olSeekBy(OLNode * node, size_t seek) {
+OLNode * olSeekBy(OLNode * node, int seek) {
     OLNode * current = node;
-    while(seek > 0 && current) {
-        current = current->next;
-        --seek;
+    while(seek != 0 && current) {
+        if(seek > 0) {
+            current = current->next;
+            --seek;
+        } else {
+            current = current->prev;
+            ++seek;
+        }
     }
     return current;
 }
@@ -71,12 +76,12 @@ OLNode * olPrev(OLNode * node) {
 }
 
 void * olValue(OLNode * node) {
-    if (node) return node->value;
+    if(node) return node->value;
     return NULL;
 }
 
-void ** olValuePtr(OLNode *node) {
-    if (node) return &node->value;
+void ** olValuePtr(OLNode * node) {
+    if(node) return &node->value;
     return NULL;
 }
 

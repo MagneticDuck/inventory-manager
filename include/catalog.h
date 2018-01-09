@@ -55,7 +55,7 @@ ListingConfig * NULL_CONFIG(void);
 ProductEntry * catFirst(Catalog *, ListingConfig *);
 ProductEntry * catLast(Catalog *, ListingConfig *);
 ProductEntry * catNext(Catalog *, ListingConfig *, ProductEntry *);
-ProductEntry * catSeekBy(Catalog *, ListingConfig *, ProductEntry *, size_t seeking);
+ProductEntry * catSeekBy(Catalog *, ListingConfig *, ProductEntry *, int seeking);
 ProductEntry * catPrev(Catalog *, ListingConfig *, ProductEntry *);
 
 ProductEntry * catAlphabeticalSupremum(Catalog *, ListingConfig * config, char * prefix);

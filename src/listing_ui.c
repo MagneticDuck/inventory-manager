@@ -1,5 +1,7 @@
 #include "data.h"
 #include "catalog.h"
+#include "util.h"
+#include <stdio.h>
 
 typedef struct {
     Catalog * catalog;
@@ -10,14 +12,14 @@ typedef struct {
 
 void printEntry(ListingState * state, ProductEntry * entry) {
     ProductRecord * record = catProductRecord(entry);
-    printf("%s, category %s", record->name,
+    printf("%s, category %s\n", record->name,
         catCategoryName(state->catalog, record->category));
 }
 
 void displayListing(ListingState * state) {
     // TODO: API for finding height of screen
     ProductEntry * entry = state->head;
-    for(int i = 10; i > 0 && entry; --i) {
+    for(int i = state->consoleHeight; i > 0 && entry; --i) {
         printEntry(state, entry);
         entry = catNext(state->catalog, state->config, entry);
     }
@@ -45,16 +47,16 @@ InterpretResult performSeek(ListingState * state, int dir, char input[]) {
         // seeking *= n; ...
         return INTERPRET_MESSAGE;
     }
-    if(!catSeekBy(state->catalog, state->config, state->head, state->consoleHeight + seeking)) {
+    ProductEntry * seekedHead = catSeekBy(state->catalog, state->config, state->head, seeking);
+    if(!seekedHead) {
         if(seeking == 1) printf("Already at end of listing!\n");
         if(seeking == -1) printf("Already at start of listing!\n");
         else printf("Cannot seek that far!\n");
         return INTERPRET_MESSAGE;
     }
-    state->head = catSeekBy(state->catalog, state->config, state->head, seeking);
+    state->head = seekedHead;
     return INTERPRET_OK;
 }
-
 
 // Returns 1 if a message was displayed and we should wait for a newline from stdin to refresh.
 InterpretResult interpretInput(ListingState * state, char input[]) {
@@ -84,7 +86,7 @@ void interactListing(Catalog * catalog, ListingConfig * config) {
     state.catalog = catalog;
     state.config = config;
     state.head = catFirst(catalog, config);
-    state.consoleHeight = 10; // TODO: find real console height
+    state.consoleHeight = 30; // TODO: find real console height
 
     loop {
         displayListing(&state);
@@ -92,7 +94,7 @@ void interactListing(Catalog * catalog, ListingConfig * config) {
         scanf("%s", input);
         InterpretResult result;
         if((result = interpretInput(&state, input))) {
-            if(result == INTERPRET_MESSAGE) scanf("%s", input);
+            if(result == INTERPRET_MESSAGE) getchar();
             if(result == INTERPRET_QUIT) break;
             // unreachable
         }
