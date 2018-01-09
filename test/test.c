@@ -31,7 +31,6 @@ void testOrderedList() {
     ASSERT_EQUALS(olIndex(nodes[3]), 1);
     ASSERT_EQUALS(olIndex(nodes[2]), 2);
     ASSERT_EQUALS(olIndex(nodes[0]), 3);
-    printf("hello world\n");
 
     olReindex(list, nodes[1], "oops");
 
@@ -75,7 +74,7 @@ void testDictionary() {
     freeDictionary(dictionary);
 }
 
-void testRandomCatalog() {
+void testWriteCatalog() {
     Catalog *catalog;
     newCatalogRandom(&catalog, 10, 1000);
     writeCatalog(catalog, "data/random.txt");
@@ -93,7 +92,7 @@ int main() {
     RUN(testLexiographicCompare);
     RUN(testOrderedList);
     RUN(testDictionary);
-    // RUN(testRandomCatalog);
+    RUN(testWriteCatalog);
     // RUN(testLoadingCatalog);
     return TEST_REPORT();
 }

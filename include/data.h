@@ -38,16 +38,19 @@ void randomRecord(ProductRecord *, Category *);
 // These methods have the responsibility of allocating the memory for Category and ProductRecord.
 // We guarantee that onDefCategory is called no more than MAX_CATEGORIES times, and no call to onDefRecord proceeds
 // a call to onDefCategory.
-bool loadFlatfile(
-    Filepath filepath, void * reader,
+bool readCatalogFile(
+    Filepath filepath, void * catcher,
     bool (*onDefCategory)(void *, Category *),
     bool (*onDefRecord)(void *, ProductRecord *));
-bool loadRandom(
+bool readRandomCatalog(
     size_t categoryCount, size_t recordCount, void * catcher,
     bool (*onDefCategory)(void *, Category *),
     bool (*onDefRecord)(void *, ProductRecord *));
+bool readRecordFile(
+    Filepath filepath, void * catcher,
+    bool (*onReadRecord)(void *, ProductRecord *));
 
-bool writeFlatfile(
+bool writeFile(
     Filepath filepath, void * iterator,
     bool (popCategory)(void *, Category **),
     bool (popRecord)(void *, ProductRecord **));

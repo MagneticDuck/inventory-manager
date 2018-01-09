@@ -51,6 +51,8 @@ typedef struct {
     int categoryFilter;
 } ListingConfig;
 
+ListingConfig * NULL_CONFIG(void);
+
 ProductEntry * catFirst(Catalog *, ListingConfig *);
 ProductEntry * catLast(Catalog *, ListingConfig *);
 ProductEntry * catNext(Catalog *, ListingConfig *, ProductEntry *);

@@ -52,7 +52,7 @@ bool stepParser(ParserState * state, char * line, void * catcher,
     if(strncmp(line, "CAT ", 4) == 0) {
         if(!state->definingCategories) {
             printf("Category definitions are not consecutive and at start of file!\n"
-            "Found out-of-place CAT on line %i.", state->lineNumber);
+                   "Found out-of-place CAT on line %i.", state->lineNumber);
             return false;
         }
         if(state->categoryCount == MAX_CATEGORIES) {
@@ -99,8 +99,8 @@ bool stepParser(ParserState * state, char * line, void * catcher,
     }
 }
 
-bool loadFlatfile(
-    Filepath filepath, void * catcher,
+bool loadFile_(
+    Filepath filepath, void * catcher, bool expectCategories,
     bool (*onCategory)(void *, Category *),
     bool (*onRecord)(void *, ProductRecord *)) {
     FILE * file = fopen(filepath, "r");
@@ -108,7 +108,7 @@ bool loadFlatfile(
         ParserState state;
         state.lineNumber = 0;
         state.categoryCount = 0;
-        state.definingCategories = true;
+        state.definingCategories = expectCategories;
         state.currentRecordField = NULL;
 
         char line[256];
@@ -124,24 +124,37 @@ bool loadFlatfile(
     return false;
 }
 
-bool loadRandom(
+bool readCatalogFile(
+    Filepath filepath, void * catcher,
+    bool (*onReadCategory)(void *, Category *),
+    bool (*onReadRecord)(void *, ProductRecord *)) {
+    return loadFile_(filepath, catcher, true, onReadCategory, onReadRecord);
+}
+
+bool readRandomCatalog(
     size_t categoryCount, size_t recordCount, void * catcher,
-    bool (* onDefCategory)(void *, Category *),
-    bool (* onDefRecord)(void *, ProductRecord *)) {
+    bool (* onReadCategory)(void *, Category *),
+    bool (* onReadRecord)(void *, ProductRecord *)) {
     Category * categories = malloc(sizeof(Category) * categoryCount);
     for(size_t i = 0; i <= categoryCount; ++i) {
         randomCategory(&categories[i], i);
-        onDefCategory(catcher, &categories[i]);
+        onReadCategory(catcher, &categories[i]);
     }
     for(size_t i = 0; i <= recordCount; ++i) {
         ProductRecord * record = malloc(sizeof(ProductRecord));
         randomRecord(record, &categories[randomIntRange(0, categoryCount - 1)]);
-        onDefRecord(catcher, record);
+        onReadRecord(catcher, record);
     }
     return true;
 }
 
-bool writeFlatfile(
+bool readRecordFile(
+    Filepath filepath, void * catcher,
+    bool (*onReadRecord)(void *, ProductRecord *)) {
+    return loadFile_(filepath, catcher, false, NULL, onReadRecord);
+}
+
+bool writeFile(
     Filepath filepath, void * iterator,
     bool (popCategory)(void *, Category **),
     bool (popRecord)(void *, ProductRecord **)) {

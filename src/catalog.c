@@ -3,6 +3,14 @@
 #include "ordered_list.h"
 #include "data.h"
 
+ListingConfig * NULL_CONFIG(void) {
+    static ListingConfig config; // static!
+    config.useFilter = false;
+    config.orderAlphabetical = true;
+    config.categoryFilter = 0;
+    return &config;
+}
+
 typedef struct ProductEntry {
     ProductRecord * record;
     DictEntry * byId;
@@ -24,10 +32,21 @@ typedef struct Catalog {
     unsigned int totalInstances;
 } Catalog;
 
+void initCategoryStats_(CategoryStats * stats) {
+    stats->netPrice = 0;
+    stats->recordCount = 0;
+    stats->totalInstance s= 0;
+}
+
 bool onDefCategory_(void * ptr, Category * category) {
     Catalog * catalog = (Catalog *) ptr;
-    catalog->categories[catalog->categoryCount++] = category;
+    catalog->categories[catalog->categoryCount] = category;
+    initCategoryStats_(&catalog->categoryStats[catalog->categoryCount]);
     olAdd(catalog->categoryLeaderboard, (void *) 0, (void *) category);
+
+    catalog->byName[catalog->categoryCount] = newOrderedList(&lexiographicCompare);
+    catalog->byPrice[catalog->categoryCount] = newOrderedList(&numericCompare);
+    ++catalog->categoryCount;
     return true;
 }
 
@@ -47,18 +66,19 @@ void newEmptyCatalog(Catalog ** catalog) {
     *catalog = malloc(sizeof(Catalog));
     Catalog * catalog_ = *catalog;
     catalog_->byId = newDictionary();
+    catalog_->categoryLeaderboard = newOrderedList(&numericCompare);
     catalog_->byName[0] = newOrderedList(&lexiographicCompare);
     catalog_->byPrice[0] = newOrderedList(&numericCompare);
 }
 
 bool newCatalogFromFile(Catalog ** catalog, Filepath filepath) {
     newEmptyCatalog(catalog);
-    loadFlatfile(filepath, (void *) *catalog, &onDefCategory_, &onDefRecord_);
+    readCatalogFile(filepath, (void *) *catalog, &onDefCategory_, &onDefRecord_);
 }
 
 void newCatalogRandom(Catalog ** catalog, size_t categoryCount, size_t recordCount) {
     newEmptyCatalog(catalog);
-    loadRandom(categoryCount, recordCount, (void *) *catalog, &onDefCategory_, &onDefRecord_);
+    readRandomCatalog(categoryCount, recordCount, (void *) *catalog, &onDefCategory_, &onDefRecord_);
 }
 
 void freeCatalog(Catalog * catalog) {
@@ -77,7 +97,7 @@ void freeCatalog(Catalog * catalog) {
 typedef struct {
     Catalog * catalog;
     size_t categoryIndex;
-    OLNode * head;
+    ProductEntry * head;
 } CatalogIterator;
 
 bool popCategory_(void * ptr, Category ** category) {
@@ -87,16 +107,20 @@ bool popCategory_(void * ptr, Category ** category) {
     return true;
 }
 
-bool popRecord_(void * ptr, ProductID ** id, ProductRecord ** record) {
-    return false; // TODO
+bool popRecord_(void * ptr, ProductRecord ** record) {
+    CatalogIterator * iterator = (CatalogIterator *) ptr;
+    if(!iterator->head) return false;
+    *record = catProductRecord(iterator->head);
+    iterator->head = catNext(iterator->catalog, &NULL_CONFIG, iterator->head);
+    return true;
 }
 
 void writeCatalog(Catalog * catalog, char * filepath) {
     CatalogIterator iterator;
     iterator.catalog = catalog;
-    iterator.head = olFirst(catalog->byName[0]);
+    iterator.head = catFirst(catalog, NULL_CONFIG());
     iterator.categoryIndex = 0;
-    writeFlatfile(filepath, (void *) &iterator, &popCategory_, &popRecord_);
+    writeFile(filepath, (void *) &iterator, &popCategory_, &popRecord_);
 }
 
 ProductEntry * catLookupProduct(Catalog * catalog, ProductID * id) {
@@ -109,8 +133,10 @@ ProductRecord * catProductRecord(ProductEntry * product) {
 
 void catRemove(Catalog * catalog, ProductEntry * entry) {
     dictRemove(catalog->byId, entry->byId);
-    olRemove(catalog->byName, entry->byName);
-    olRemove(catalog->byPrice, entry->byPrice);
+    for(size_t i = 0; i <= catalog->categoryCount; ++i) {
+        olRemove(catalog->byName[i], (entry->byName));
+        olRemove(catalog->byPrice[i], entry->byPrice);
+    }
 }
 
 OLNode * getRelevantNode_(ProductEntry * entry, ListingConfig * config) {
