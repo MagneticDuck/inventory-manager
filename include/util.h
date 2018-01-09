@@ -14,6 +14,7 @@
 #define loop for(;;)
 typedef char * Filepath;
 void unimplemented(void);
+void * tryDereference(void **);
 
 // Comparisons. A <= B.
 bool lexiographicCompare(void * ptrA, void * ptrB); // Pointers to char.

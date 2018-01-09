@@ -38,10 +38,9 @@ size_t dictSize(Dictionary *dictionary) {
     return olSize(dictionary->list);
 }
 
-
 DictionaryEntry * dictLookup(Dictionary * dictionary, char * key) {
     OLNode * closest = olSupremum(dictionary->list, key);
-    if (closest && 0 == strcmp((char *) olKey(closest), key)) return *olValue(closest);
+    if (closest && 0 == strcmp((char *) olKey(closest), key)) return olValue(closest);
     return NULL;
 }
 
@@ -49,7 +48,7 @@ DictionaryEntry * dictAdd(Dictionary * dictionary, char * key, void * value) {
     OLNode * newNode = olAddWithoutDuplication(dictionary->list, key, NULL);
     if (!newNode) return NULL;
     DictionaryEntry * entry = malloc(sizeof(DictionaryEntry));
-    *olValue(newNode) = entry;
+    *olValuePtr(newNode) = entry;
     entry->value = value;
     entry->node = newNode;
     return entry;
@@ -61,11 +60,13 @@ void dictRemove(Dictionary * dictionary, DictionaryEntry * entry) {
 }
 
 char * dictKey(DictionaryEntry * entry) {
-    return olKey(entry->node);
+    if (entry) return olKey(entry->node);
+    return NULL;
 }
 
-void ** dictValue(DictionaryEntry * entry) {
-    return &entry->value;
+void * dictValue(DictionaryEntry * entry) {
+    if (entry) return entry->value;
+    return NULL;
 }
 
 #else

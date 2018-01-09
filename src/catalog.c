@@ -23,13 +23,14 @@ void freeCategoryEntry_(CategoryEntry * entry) {
     free(entry->name);
     free(entry);
 }
-
+/*
 typedef struct ProductEntry {
     ProductRecord * record;
     DictEntry * byId;
     OLNode * byName[2];
     OLNode * byPrice[2];
 } ProductEntry;
+*/
 
 typedef struct Catalog {
     // Index CategoryEntry.
@@ -47,12 +48,12 @@ CategoryEntry * catCategoryEntry_(Catalog * catalog, CategoryCode code) {
 }
 
 void catSortCategories_(Catalog * catalog) {
-    if (catalog->categoriesByValue) freeOrderedList(catalog->categoriesByValue);
+    if(catalog->categoriesByValue) freeOrderedList(catalog->categoriesByValue);
     // TODO
 }
 
 void catUnsortCategories_(Catalog * catalog) {
-    if (catalog->categoriesByValue) freeOrderedList(catalog->categoriesByValue);
+    if(catalog->categoriesByValue) freeOrderedList(catalog->categoriesByValue);
     catalog->categoriesByValue = NULL;
 }
 
@@ -76,7 +77,7 @@ bool onReadCategory_(void * ptr, char * name) {
 bool onReadRecord_(void * ptr, ProductRecord * record) {
     Catalog * catalog = (Catalog *) ptr;
 
-    if (record->category > catCategoryCount(catalog)) {
+    if(record->category > catCategoryCount(catalog)) {
         printf("Category code out of bounds!\n");
         return false;
     }
@@ -91,6 +92,8 @@ bool onReadRecord_(void * ptr, ProductRecord * record) {
     entry->byPrice[0] = olAdd(catalog->productsByPrice[0], (void *) &record->price, (void *) entry);
     entry->byName[1] = olAdd(catalog->productsByName[record->category + 1], (void *) record->name, (void *) entry);
     entry->byPrice[1] = olAdd(catalog->productsByPrice[record->category + 1], (void *) &record->price, (void *) entry);
+
+    printf("name: %s\n", entry->record->name);
 
     // Update category net value.
     CategoryEntry * catEntry = catCategoryEntry_(catalog, record->category);
@@ -126,7 +129,7 @@ void freeCatalog(Catalog * catalog) {
         freeOrderedList(catalog->productsByName[i]);
         freeOrderedList(catalog->productsByPrice[i]);
     }
-    if (catalog->categoriesByValue) freeOrderedList(catalog->categoriesByValue);
+    if(catalog->categoriesByValue) freeOrderedList(catalog->categoriesByValue);
     for(size_t i = 0; i < catCategoryCount(catalog); ++i)
         freeCategoryEntry_(arrayAccess(catalog->categoriesByCode, i));
     freeArray(catalog->categoriesByCode);
@@ -150,6 +153,7 @@ bool popRecord_(void * ptr, ProductRecord ** record) {
     CatalogIterator * iterator = (CatalogIterator *) ptr;
     if(!iterator->head) return false;
     *record = catProductRecord(iterator->head);
+    printf("popping record with name %s, incrementing...\n", (*record)->name);
     iterator->head = catNext(iterator->catalog, NULL_CONFIG(), iterator->head);
     return true;
 }
@@ -162,23 +166,23 @@ void writeCatalog(Catalog * catalog, char * filepath) {
     writeFile(filepath, (void *) &iterator, &popCategory_, &popRecord_);
 }
 
-size_t catRecordCount(Catalog *catalog) {
+size_t catRecordCount(Catalog * catalog) {
     return dictSize(catalog->productsById);
 }
 
-CategoryCode catCategoryCount(Catalog *catalog) {
+CategoryCode catCategoryCount(Catalog * catalog) {
     return arraySize(catalog->categoriesByCode);
 }
 
-char * catCategoryName(Catalog *catalog, CategoryCode code) {
+char * catCategoryName(Catalog * catalog, CategoryCode code) {
     return catCategoryEntry_(catalog, code)->name;
 }
 
-Price catCategoryValue(Catalog *catalog, CategoryCode code) {
+Price catCategoryValue(Catalog * catalog, CategoryCode code) {
     return catCategoryEntry_(catalog, code)->netValue;
 }
 
-CategoryCode catCategoryByRank(Catalog *catalog, size_t place) {
+CategoryCode catCategoryByRank(Catalog * catalog, size_t place) {
     catSortCategories_(catalog);
     OLNode * seeked = olSeekBy(olFirst(catalog->categoriesByValue), place);
     return ((CategoryEntry *) olValue(seeked))->code;

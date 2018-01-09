@@ -8,8 +8,16 @@
 #include <stdio.h>
 #include "data.h"
 #include "util.h"
+#include "dictionary.h"
+#include "ordered_list.h"
 
-typedef struct ProductEntry ProductEntry;
+typedef struct ProductEntry {
+    ProductRecord * record;
+    DictEntry * byId;
+    OLNode * byName[2];
+    OLNode * byPrice[2];
+} ProductEntry;
+
 typedef struct Catalog Catalog;
 
 // Lifetime management and file IO.

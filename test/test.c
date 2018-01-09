@@ -31,20 +31,23 @@ void testOrderedList() {
     ASSERT_EQUALS(olIndex(nodes[3]), 1);
     ASSERT_EQUALS(olIndex(nodes[2]), 2);
     ASSERT_EQUALS(olIndex(nodes[0]), 3);
+    ASSERT_EQUALS(olNext(nodes[0]), NULL);
+    ASSERT_EQUALS(olPrev(nodes[1]), NULL);
+    ASSERT_STRING_EQUALS(olKey(olSupremum(list, "")), "");
+
+    ASSERT_EQUALS(olSupremum(list, "oops"), NULL);
 
     olReindex(list, nodes[1], "oops");
 
+    ASSERT_EQUALS(olLast(list), nodes[1]);
     ASSERT_EQUALS(olIndex(nodes[3]), 0);
     ASSERT_EQUALS(olIndex(nodes[2]), 1);
     ASSERT_EQUALS(olIndex(nodes[0]), 2);
     ASSERT_EQUALS(olPrev(nodes[1]), nodes[0]);
+    ASSERT_EQUALS(olNext(nodes[0]), nodes[1]);
     ASSERT_EQUALS(olIndex(nodes[1]), 3);
 
-    ASSERT_EQUALS(olNext(nodes[1]), nodes[3]);
-    ASSERT_EQUALS(olPrev(nodes[3]), nodes[1]);
-    ASSERT_EQUALS(olSupremum(list, "hello world"), NULL);
     ASSERT_STRING_EQUALS(olKey(olSupremum(list, "ab")), "abb");
-    ASSERT_STRING_EQUALS(olKey(olSupremum(list, "")), "");
     ASSERT_STRING_EQUALS(olKey(olSupremum(list, "abb")), "abb");
 
     olRemove(list, nodes[1]);
@@ -61,7 +64,7 @@ void testDictionary() {
     entries[1] = dictAdd(dictionary, "goodbye", "world");
     entries[2] = dictAdd(dictionary, "", "oops");
 
-    ASSERT_STRING_EQUALS(*dictValue(entries[0]), "world");
+    ASSERT_STRING_EQUALS(dictValue(entries[0]), "world");
     ASSERT_STRING_EQUALS(dictKey(entries[0]), "hello");
 
     ASSERT_EQUALS(dictLookup(dictionary, "hello"), entries[0]);
@@ -75,17 +78,17 @@ void testDictionary() {
     freeDictionary(dictionary);
 }
 
-void testModifyCatalog() {
-    Catalog *catalog;
-    ASSERT_EQUALS(catRecordCount(catalog), 0);
-
-}
-
 void testWriteCatalog() {
     Catalog *catalog;
     newCatalogRandom(&catalog, 10, 10);
     ASSERT_EQUALS(catCategoryCount(catalog), 10);
+    printf("%i\n", catRecordCount(catalog));
     ASSERT_EQUALS(catRecordCount(catalog), 10);
+
+    ProductEntry * entry = catFirst(catalog, NULL_CONFIG());
+    ASSERT("", entry->byName[0]);
+    ProductEntry * next = catNext(catalog, NULL_CONFIG(), entry);
+
     writeCatalog(catalog, "data/random.txt");
     freeCatalog(catalog);
 }
@@ -99,9 +102,9 @@ void testLoadingCatalog() {
 int main() {
     initRandomSeed();
     RUN(testLexiographicCompare);
-    // RUN(testOrderedList);
+    RUN(testOrderedList);
     RUN(testDictionary);
-    // RUN(testWriteCatalog);
+    RUN(testWriteCatalog);
     // RUN(testLoadingCatalog);
     return TEST_REPORT();
 }

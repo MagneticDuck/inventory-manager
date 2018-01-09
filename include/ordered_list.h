@@ -24,7 +24,8 @@ OLNode * olSeekBy(OLNode *, size_t seeking);
 OLNode * olNext(OLNode *);
 OLNode * olPrev(OLNode *);
 
-void ** olValue(OLNode *);
+void * olValue(OLNode *);
+void ** olValuePtr(OLNode *);
 void * olKey(OLNode *); // Do not edit!
 size_t olIndex(OLNode *);
 

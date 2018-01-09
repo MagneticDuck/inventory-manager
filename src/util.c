@@ -5,6 +5,11 @@ void unimplemented(void) {
     printf("asjdfjslkdjflkdsa");
 }
 
+void * tryDereference(void ** ptr) {
+    if (!ptr) return NULL;
+    return *ptr;
+}
+
 bool lexiographicCompare(void * ptrA, void * ptrB) {
     char * strA = (char *) ptrA, * strB = (char *) ptrB;
     for(size_t i = 0;; ++i) {

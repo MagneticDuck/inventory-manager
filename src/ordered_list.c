@@ -23,6 +23,7 @@ OrderedList * newOrderedList(OrderingFunction ordering) {
     list->ordering = ordering;
     list->first = NULL;
     list->last = NULL;
+    list->size = 0;
     return list;
 }
 
@@ -69,8 +70,14 @@ OLNode * olPrev(OLNode * node) {
     return node->prev;
 }
 
-void ** olValue(OLNode * node) {
-    return &node->value;
+void * olValue(OLNode * node) {
+    if (node) return node->value;
+    return NULL;
+}
+
+void ** olValuePtr(OLNode *node) {
+    if (node) return &node->value;
+    return NULL;
 }
 
 void * olKey(OLNode * node) {
@@ -86,8 +93,15 @@ size_t olIndex(OLNode * node) {
 void olInsertBefore_(OrderedList * list, OLNode * successor, OLNode * newNode) {
     ++list->size;
     if(!successor) {
-        if(list->last) list->last->next = newNode;
-        else list->first = newNode;
+        if(list->last) {
+            list->last->next = newNode;
+            newNode->prev = list->last;
+            newNode->next = NULL;
+        } else {
+            newNode->prev = NULL;
+            newNode->next = NULL;
+            list->first = newNode;
+        }
         list->last = newNode;
     } else {
         newNode->next = successor;
