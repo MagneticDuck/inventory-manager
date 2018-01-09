@@ -107,12 +107,12 @@ bool readRandomCatalog(
     size_t categoryCount, size_t recordCount, void * catcher,
     bool (* onReadCategory)(void *, char *),
     bool (* onReadRecord)(void *, ProductRecord *)) {
-    for(size_t i = 0; i <= categoryCount; ++i) {
+    for(size_t i = 0; i < categoryCount; ++i) {
         char * name = malloc(sizeof(char) * MAX_STRING_LENGTH);
         randomWord(name);
         onReadCategory(catcher, name);
     }
-    for(size_t i = 0; i <= recordCount; ++i) {
+    for(size_t i = 0; i < recordCount; ++i) {
         ProductRecord * record = malloc(sizeof(ProductRecord));
         randomRecord_(record, categoryCount);
         onReadRecord(catcher, record);

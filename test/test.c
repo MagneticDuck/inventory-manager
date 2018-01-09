@@ -78,7 +78,10 @@ void testDictionary() {
 void testWriteCatalog() {
     Catalog *catalog;
     newCatalogRandom(&catalog, 10, 10);
-    writeCatalog(catalog, "data/random.txt");
+    printf("%i\n", catCategoryCount(catalog));
+    ASSERT_EQUALS(catCategoryCount(catalog), 10);
+    ASSERT_EQUALS(catRecordCount(catalog), 10);
+    // writeCatalog(catalog, "data/random.txt");
     freeCatalog(catalog);
 }
 

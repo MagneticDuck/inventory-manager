@@ -64,8 +64,6 @@ bool onReadCategory_(void * ptr, char * name) {
     entry->code = arrayAppend(catalog->categoriesByCode, entry);
     entry->netValue = 0;
 
-    printf("Initialized category %i...\n", entry->code);
-
     catalog->productsByName[entry->code + 1] = newOrderedList(&lexiographicCompare);
     catalog->productsByPrice[entry->code + 1] = newOrderedList(&priceCompare);
     return true;
@@ -78,8 +76,6 @@ bool onReadRecord_(void * ptr, ProductRecord * record) {
         printf("Category code out of bounds!\n");
         return false;
     }
-
-    printf("Accessing category %i...\n", record->category);
 
     // Add record to all the structures.
     dictAdd(catalog->productsById, (void *) record->id, (void *) record);

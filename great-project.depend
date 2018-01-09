@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1515499807 source:/home/magneticduck/git/great-project/test/test.c
+1515514455 source:/home/magneticduck/git/great-project/test/test.c
 	"tinytest.h"
 	"util.h"
 	"data.h"
@@ -36,7 +36,7 @@
 	"util.h"
 	"data.h"
 
-1515513386 source:/home/magneticduck/git/great-project/src/catalog.c
+1515514416 source:/home/magneticduck/git/great-project/src/catalog.c
 	"array.h"
 	"catalog.h"
 	"dictionary.h"
