@@ -138,7 +138,7 @@ typedef struct {
 bool popCategory_(void * ptr, char ** name) {
     CatalogIterator * iterator = (CatalogIterator *) ptr;
     if(iterator->categoryIndex >= catCategoryCount(iterator->catalog)) return false;
-    name = catCategoryEntry_(iterator->catalog, iterator->categoryIndex)->name;
+    *name = catCategoryEntry_(iterator->catalog, iterator->categoryIndex)->name;
     return true;
 }
 
@@ -243,7 +243,7 @@ ProductEntry * catPriceSupremum(Catalog * catalog, ListingConfig * config, Price
     OrderedList * relevant;
     if(!config->useFilter) relevant = catalog->productsByPrice[0];
     else relevant = catalog->productsByPrice[config->categoryFilter + 1];
-    return (ProductEntry *) olValue(olSupremum(relevant, (void *) price));
+    return (ProductEntry *) olValue(olSupremum(relevant, (void *) &price));
 }
 
 ProductEntry * catLookup(Catalog * catalog, ListingConfig * config, ProductId id) {

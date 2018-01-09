@@ -13,6 +13,7 @@ bool readString(size_t lineNumber, char * dest, char * line) {
     unimplemented();
 }
 
+// Return true if things went well, otherwise display a message with lineNumber and return false.
 bool readInt(size_t lineNumber, int * dest, char * line) {
     unimplemented();
 }
@@ -25,11 +26,11 @@ bool stepParser(ParserState * state, char * line, void * catcher,
     if(strncmp(line, "CAT ", 4) == 0) {
         if(!state->definingCategories) {
             printf("Category definitions are not consecutive and at start of file!\n"
-                   "Found out-of-place CAT on line %i.", state->lineNumber);
+                   "Found out-of-place CAT on line %zu.", state->lineNumber);
             return false;
         }
-        char name = malloc(sizeof(char) * MAX_STRING_LENGTH);
-        strcpy(name, line[4]);
+        char * name = malloc(sizeof(char) * MAX_STRING_LENGTH);
+        strcpy(name, &line[4]);
         onCategory(catcher, name);
         return true;
     }
@@ -51,7 +52,7 @@ bool stepParser(ParserState * state, char * line, void * catcher,
             return readString(state->lineNumber, state->parsedRecord->name, line);
         case 3:
             return readInt(state->lineNumber, &state->parsedRecord->price, line);
-        case 4: {
+        default: {
             CategoryCode code;
             if(!readInt(state->lineNumber, &code, line)) return false;
             state->parsedRecord->category = code;
@@ -71,7 +72,8 @@ bool loadFile_(
         ParserState state;
         state.lineNumber = 0;
         state.definingCategories = expectCategories;
-        state.currentRecordField = NULL;
+        state.currentRecordField = 0;
+        state.parsedRecord = NULL;
 
         char line[256];
         while(fgets(line, 256, file)) {
@@ -129,6 +131,10 @@ bool writeFile(
     bool (popCategory)(void *, char **),
     bool (popRecord)(void *, ProductRecord **)) {
     FILE * file = fopen(filepath, "w");
+    if (!file) {
+        printf("Could not open file for writing!");
+        return false;
+    }
     {
         char * name;
         while(popCategory(iterator, &name)) {
@@ -140,7 +146,7 @@ bool writeFile(
 #define STRING "%s\n"
 #define INT "%i\n"
         while(popRecord(iterator, &record)) {
-            fprintf(STRING INT STRING INT INT,
+            fprintf(file, STRING INT STRING INT INT,
                     record->id,
                     record->instances,
                     record->name,
@@ -150,4 +156,5 @@ bool writeFile(
 #undef STRING
 #undef INT
     }
+    return true;
 }

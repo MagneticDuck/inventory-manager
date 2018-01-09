@@ -21,10 +21,10 @@
 1515420303 /home/magneticduck/git/great-project/include/algorithms/ordered_list.h
 	"util.h"
 
-1515509806 source:/home/magneticduck/git/great-project/src/data.c
+1515513707 source:/home/magneticduck/git/great-project/src/data.c
 	"data.h"
 
-1515509164 /home/magneticduck/git/great-project/include/data.h
+1515513542 /home/magneticduck/git/great-project/include/data.h
 	<stdio.h>
 	"util.h"
 
@@ -36,7 +36,7 @@
 	"util.h"
 	"data.h"
 
-1515511325 source:/home/magneticduck/git/great-project/src/catalog.c
+1515513386 source:/home/magneticduck/git/great-project/src/catalog.c
 	"array.h"
 	"catalog.h"
 	"dictionary.h"

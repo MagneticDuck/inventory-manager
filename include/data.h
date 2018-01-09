@@ -16,14 +16,14 @@ typedef char CategoryName[MAX_STRING_LENGTH + 1];
 
 typedef int Price;
 #define FORMAT_PRICE "%i"
-typedef unsigned char CategoryCode;
+typedef int CategoryCode;
 
 typedef struct {
     ProductId id;
     ProductName name;
     Price price;
     CategoryCode category;
-    unsigned int instances;
+    int instances;
 } ProductRecord;
 
 // These methods have the responsibility of allocating the memory for the category name and ProductRecord.
