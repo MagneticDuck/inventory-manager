@@ -49,7 +49,11 @@ CategoryEntry * catCategoryEntry_(Catalog * catalog, CategoryCode code) {
 
 void catSortCategories_(Catalog * catalog) {
     if(catalog->categoriesByValue) freeOrderedList(catalog->categoriesByValue);
-    // TODO
+    catalog->categoriesByValue = newOrderedList(&priceCompare);
+    for (CategoryCode code = 0; code < catCategoryCount(catalog); ++code) {
+        CategoryEntry * entry = catCategoryEntry_(catalog, code);
+        entry->byValue = olAdd(catalog->categoriesByValue, (void *) &entry->netValue, (void *) entry);
+    }
 }
 
 void catUnsortCategories_(Catalog * catalog) {
@@ -161,6 +165,13 @@ void writeCatalog(Catalog * catalog, char * filepath) {
     iterator.head = catFirst(catalog, NULL_CONFIG());
     iterator.categoryIndex = 0;
     writeFile(filepath, (void *) &iterator, &popCategory_, &popRecord_);
+}
+
+void ppRecord(Catalog* catalog, ProductEntry* entry) {
+    ProductRecord * record = catProductRecord(entry);
+    printf("%s | %-50s | %-20s | %-3i | %-3i\n", record->id, record->name,
+           catCategoryName(catalog, record->category),
+           record->price, record->instances);
 }
 
 size_t catRecordCount(Catalog * catalog) {

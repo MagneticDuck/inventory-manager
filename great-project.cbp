@@ -60,6 +60,12 @@
 		<Unit filename="include/listing_ui.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
+		<Unit filename="include/menu">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="include/menu.h">
+			<Option target="Debug" />
+		</Unit>
 		<Unit filename="include/ordered_list.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
@@ -78,6 +84,9 @@
 		<Unit filename="src/dictionary.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src/lines.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="src/listing_ui.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -85,6 +94,11 @@
 			<Option compilerVar="CC" />
 			<Option target="Release" />
 			<Option target="Debug" />
+		</Unit>
+		<Unit filename="src/menu.c">
+			<Option compilerVar="CC" />
+			<Option target="Debug" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="src/ordered_list.c">
 			<Option compilerVar="CC" />
@@ -104,6 +118,7 @@
 				<search_path add="include" />
 			</code_completion>
 			<debugger />
+			<envvars />
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>

@@ -30,6 +30,8 @@ void writeCatalog(Catalog * catalog, char * filepath);
 
 // Basic queries.
 
+void ppRecord(Catalog *catalog, ProductEntry *entry);
+
 size_t catRecordCount(Catalog *);
 CategoryCode catCategoryCount(Catalog *);
 char * catCategoryName(Catalog *, CategoryCode);

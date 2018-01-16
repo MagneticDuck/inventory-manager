@@ -7,9 +7,13 @@
 	"catalog.h"
 	"dictionary.h"
 
+1515527764 y.h"
+
 1514985137 /home/magneticduck/git/great-project/test/tinytest.h
 	<stdio.h>
 	<stdlib.h>
+
+1515530850 
 
 1515523261 /home/magneticduck/git/great-project/include/util.h
 	<stdio.h>
@@ -17,6 +21,8 @@
 	<stdlib.h>
 	<string.h>
 	<stdbool.h>
+
+1515540969 >
 
 1515420303 /home/magneticduck/git/great-project/include/algorithms/ordered_list.h
 	"util.h"
@@ -31,6 +37,8 @@
 1515362381 source:/home/magneticduck/git/great-project/src/algorithms/ordered_list.c
 	"util.h"
 	"algorithms/ordered_list.h"
+
+1515362381 s/ordered_list.h"
 
 1515523281 source:/home/magneticduck/git/great-project/src/util.c
 	"util.h"
@@ -49,6 +57,8 @@
 	"util.h"
 	"dictionary.h"
 	"ordered_list.h"
+
+1515500656 ist.h"
 
 1515362397 source:/home/magneticduck/git/great-project/src/algorithms/dictionary.c
 	"algorithms/dictionary.h"
@@ -81,6 +91,8 @@
 	"listing_ui.h"
 	"catalog.h"
 
+1515500656 "
+
 1515418299 /home/magneticduck/git/great-project/include/listing_ui.h
 	"catalog.h"
 
@@ -89,4 +101,191 @@
 
 1515506280 /home/magneticduck/git/great-project/include/array.h
 	"util.h"
+
+1515500656 source:c:\users\josé\desktop\programacao ii\inventory-manager-master\src\array.c
+	"array.h"
+
+1515500656 c:\users\josé\desktop\programacao ii\inventory-manager-master\include\array.h
+	"util.h"
+
+1515540969 c:\users\josé\desktop\programacao ii\inventory-manager-master\include\util.h
+	<stdio.h>
+	<stddef.h>
+	<stdlib.h>
+	<string.h>
+	<stdbool.h>
+
+1515541469 source:c:\users\josé\desktop\programacao ii\inventory-manager-master\src\catalog.c
+	"array.h"
+	"catalog.h"
+	"dictionary.h"
+	"ordered_list.h"
+	"data.h"
+
+1515540877 c:\users\josé\desktop\programacao ii\inventory-manager-master\include\catalog.h
+	<stdio.h>
+	"data.h"
+	"util.h"
+	"dictionary.h"
+	"ordered_list.h"
+
+1515500656 c:\users\josé\desktop\programacao ii\inventory-manager-master\include\data.h
+	<stdio.h>
+	"util.h"
+
+1515500656 c:\users\josé\desktop\programacao ii\inventory-manager-master\include\dictionary.h
+	"util.h"
+
+1515500656 c:\users\josé\desktop\programacao ii\inventory-manager-master\include\ordered_list.h
+	"util.h"
+
+1515500656 source:c:\users\josé\desktop\programacao ii\inventory-manager-master\src\dictionary.c
+	"dictionary.h"
+	"ordered_list.h"
+
+1515540996 source:c:\users\josé\desktop\programacao ii\inventory-manager-master\src\listing_ui.c
+	"data.h"
+	"catalog.h"
+	"util.h"
+	"lines.h"
+	<stdio.h>
+
+1515541676 source:c:\users\josé\desktop\programacao ii\inventory-manager-master\src\main.c
+	<stdio.h>
+	<stdlib.h>
+	<curses.h>
+	"catalog.h"
+	"util.h"
+	"listing_ui.h"
+
+1515541676 i.h"
+
+1515500656 c:\users\josé\desktop\programacao ii\inventory-manager-master\include\listing_ui.h
+	"catalog.h"
+
+1515500656 source:c:\users\josé\desktop\programacao ii\inventory-manager-master\src\ordered_list.c
+	"util.h"
+	"ordered_list.h"
+
+1515541684 source:c:\users\josé\desktop\programacao ii\inventory-manager-master\src\util.c
+	"util.h"
+	"data.h"
+
+1515540120 source:c:\users\josé\desktop\programacao ii\inventory-manager-master\src\data.c
+	"data.h"
+
+1515530850 source:c:\users\josé\desktop\programacao ii\inventory-manager-master\test\test.c
+	"tinytest.h"
+	"util.h"
+	"data.h"
+	"ordered_list.h"
+	"catalog.h"
+	"dictionary.h"
+	<stdio.h>
+
+1515500656 c:\users\josé\desktop\programacao ii\inventory-manager-master\test\tinytest.h
+	<stdio.h>
+	<stdlib.h>
+
+1515539073 source:c:\users\josé\desktop\programacao ii\inventory-manager-master\src\lines.c
+	<curses.h>
+
+1515538970 c:\users\josé\desktop\programacao ii\inventory-manager-master\include\lines.h
+
+1515500656 source:/home/magneticduck/Downloads/great-project/JoseDiasChrisGadzinski/inventory-manager-master/src/array.c
+	"array.h"
+
+1515500656 /home/magneticduck/Downloads/great-project/JoseDiasChrisGadzinski/inventory-manager-master/include/array.h
+	"util.h"
+
+1516130834 /home/magneticduck/Downloads/great-project/JoseDiasChrisGadzinski/inventory-manager-master/include/util.h
+	<stdio.h>
+	<stddef.h>
+	<stdlib.h>
+	<string.h>
+	<stdbool.h>
+
+1515541469 source:/home/magneticduck/Downloads/great-project/JoseDiasChrisGadzinski/inventory-manager-master/src/catalog.c
+	"array.h"
+	"catalog.h"
+	"dictionary.h"
+	"ordered_list.h"
+	"data.h"
+
+1515540877 /home/magneticduck/Downloads/great-project/JoseDiasChrisGadzinski/inventory-manager-master/include/catalog.h
+	<stdio.h>
+	"data.h"
+	"util.h"
+	"dictionary.h"
+	"ordered_list.h"
+
+1516123928 /home/magneticduck/Downloads/great-project/JoseDiasChrisGadzinski/inventory-manager-master/include/data.h
+	<stdio.h>
+	"util.h"
+
+1515500656 /home/magneticduck/Downloads/great-project/JoseDiasChrisGadzinski/inventory-manager-master/include/dictionary.h
+	"util.h"
+
+1515500656 /home/magneticduck/Downloads/great-project/JoseDiasChrisGadzinski/inventory-manager-master/include/ordered_list.h
+	"util.h"
+
+1516130921 source:/home/magneticduck/Downloads/great-project/JoseDiasChrisGadzinski/inventory-manager-master/src/data.c
+	"data.h"
+
+1515500656 source:/home/magneticduck/Downloads/great-project/JoseDiasChrisGadzinski/inventory-manager-master/src/dictionary.c
+	"dictionary.h"
+	"ordered_list.h"
+
+1516117506 source:/home/magneticduck/Downloads/great-project/JoseDiasChrisGadzinski/inventory-manager-master/src/lines.c
+	<curses.h>
+
+1516123391 source:/home/magneticduck/Downloads/great-project/JoseDiasChrisGadzinski/inventory-manager-master/src/listing_ui.c
+	"data.h"
+	"catalog.h"
+	"util.h"
+	<stdio.h>
+
+1515538970 /home/magneticduck/Downloads/great-project/JoseDiasChrisGadzinski/inventory-manager-master/include/lines.h
+
+1516133346 source:/home/magneticduck/Downloads/great-project/JoseDiasChrisGadzinski/inventory-manager-master/src/main.c
+	<stdio.h>
+	<stdlib.h>
+	<curses.h>
+	"catalog.h"
+	"util.h"
+	"menu.h"
+	"listing_ui.h"
+
+1515500656 /home/magneticduck/Downloads/great-project/JoseDiasChrisGadzinski/inventory-manager-master/include/listing_ui.h
+	"catalog.h"
+
+1515500656 source:/home/magneticduck/Downloads/great-project/JoseDiasChrisGadzinski/inventory-manager-master/src/ordered_list.c
+	"util.h"
+	"ordered_list.h"
+
+1516130855 source:/home/magneticduck/Downloads/great-project/JoseDiasChrisGadzinski/inventory-manager-master/src/util.c
+	<ncurses.h>
+	"util.h"
+	"data.h"
+
+1515530850 source:/home/magneticduck/Downloads/great-project/JoseDiasChrisGadzinski/inventory-manager-master/test/test.c
+	"tinytest.h"
+	"util.h"
+	"data.h"
+	"ordered_list.h"
+	"catalog.h"
+	"dictionary.h"
+	<stdio.h>
+
+1515500656 /home/magneticduck/Downloads/great-project/JoseDiasChrisGadzinski/inventory-manager-master/test/tinytest.h
+	<stdio.h>
+	<stdlib.h>
+
+1516133170 /home/magneticduck/Downloads/great-project/JoseDiasChrisGadzinski/inventory-manager-master/include/menu.h
+	"util.h"
+	"data.h"
+
+1516132147 source:/home/magneticduck/Downloads/great-project/JoseDiasChrisGadzinski/inventory-manager-master/src/menu.c
+	"menu.h"
+	<curses.h>
 

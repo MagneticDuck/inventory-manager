@@ -2,7 +2,7 @@
 #include "catalog.h"
 #include "util.h"
 #include <stdio.h>
-
+/*
 typedef struct {
     Catalog * catalog;
     ProductEntry * head;
@@ -11,22 +11,25 @@ typedef struct {
 } ListingState;
 
 void printEntry(ListingState * state, ProductEntry * entry) {
-    ProductRecord * record = catProductRecord(entry);
-    printf("%s, category %s\n", record->name,
-        catCategoryName(state->catalog, record->category));
+    ppRecord(state->catalog, entry);
 }
 
 void displayListing(ListingState * state) {
     // TODO: API for finding height of screen
     ProductEntry * entry = state->head;
-    for(int i = state->consoleHeight; i > 0 && entry; --i) {
-        printEntry(state, entry);
-        entry = catNext(state->catalog, state->config, entry);
+    for(int i = state->consoleHeight - 1; i > 0; --i) {
+        if (entry) {
+            printEntry(state, entry);
+            entry = catNext(state->catalog, state->config, entry);
+        } else {
+            printf("\n");
+        }
     }
     printf(">");
 }
 
 typedef enum {
+
     INTERPRET_OK = 0,
     INTERPRET_MESSAGE,
     INTERPRET_QUIT
@@ -47,10 +50,12 @@ InterpretResult performSeek(ListingState * state, int dir, char input[]) {
         // seeking *= n; ...
         return INTERPRET_MESSAGE;
     }
-    ProductEntry * seekedHead = catSeekBy(state->catalog, state->config, state->head, seeking);
-    if(!seekedHead) {
+    ProductEntry * seekedHead = catSeekBy(state->catalog, state->config, state->head, seeking),
+                   * seekedBottom = catSeekBy(state->catalog, state->config, state->head, seeking + state->consoleHeight);
+
+    if(!seekedHead || !seekedBottom) {
         if(seeking == 1) printf("Already at end of listing!\n");
-        if(seeking == -1) printf("Already at start of listing!\n");
+        else if(seeking == -1) printf("Already at start of listing!\n");
         else printf("Cannot seek that far!\n");
         return INTERPRET_MESSAGE;
     }
@@ -74,7 +79,7 @@ InterpretResult interpretInput(ListingState * state, char input[]) {
         return INTERPRET_QUIT;
     }
     default: {
-        printf("Your command was not recognized. Try 'h' for help.");
+        printf("Your command was not recognized. Try 'h' for help.\n");
         return 1;
     }
     }
@@ -86,7 +91,7 @@ void interactListing(Catalog * catalog, ListingConfig * config) {
     state.catalog = catalog;
     state.config = config;
     state.head = catFirst(catalog, config);
-    state.consoleHeight = 30; // TODO: find real console height
+    state.consoleHeight = getConsoleLines();
 
     loop {
         displayListing(&state);
@@ -94,9 +99,14 @@ void interactListing(Catalog * catalog, ListingConfig * config) {
         scanf("%s", input);
         InterpretResult result;
         if((result = interpretInput(&state, input))) {
-            if(result == INTERPRET_MESSAGE) getchar();
+            if(result == INTERPRET_MESSAGE) {
+                int x = 0;
+
+                awaitNewline(2);
+            }
             if(result == INTERPRET_QUIT) break;
             // unreachable
         }
     }
 }
+*/

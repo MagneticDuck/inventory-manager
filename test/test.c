@@ -4,6 +4,8 @@
 #include "ordered_list.h"
 #include "catalog.h"
 #include "dictionary.h"
+#include <stdio.h>
+
 
 // These tests were written as a part of the code's development and now are essentially safeguards against regression.
 // They are not meant to be complete unit-tests.
@@ -90,7 +92,7 @@ void testDictionary() {
 
 void testWriteCatalog() {
     Catalog * catalog;
-    newCatalogRandom(&catalog, 10, 1000);
+    newCatalogRandom(&catalog, 10, 100);
     ASSERT_EQUALS(catCategoryCount(catalog), 10);
 
     writeCatalog(catalog, "data/random.txt");
@@ -99,7 +101,7 @@ void testWriteCatalog() {
 
 void testLoadingCatalog() {
     Catalog * catalog;
-    ASSERT_EQUALS(newCatalogFromFile(&catalog, "data/demo.txt"), true);
+    ASSERT_EQUALS(newCatalogFromFile(&catalog, "data/random.txt"), true);
     freeCatalog(catalog);
 }
 
@@ -109,6 +111,6 @@ int main() {
     RUN(testOrderedList);
     RUN(testDictionary);
     RUN(testWriteCatalog);
-    // RUN(testLoadingCatalog);
-    return TEST_REPORT();
+    RUN(testLoadingCatalog);
+    TEST_REPORT();
 }

@@ -9,12 +9,24 @@ typedef struct {
 } ParserState;
 
 // Sanitize maybe?
-bool readString(size_t lineNumber, char * dest, char * line) {
+bool readString(size_t lineNumber, size_t maxLength, char * dest, char * line) {
+    size_t length = strlen(line);
+    if (length > maxLength + 1) {
+        printf("String on line %lui is longer than maximum length!\n", lineNumber);
+        return false;
+    }
+    memcpy(dest, line, length - 2);
+    line[length - 2] = '\0';
+    return true;
 }
 
 // Return true if things went well, otherwise display a message with lineNumber and return false.
 bool readInt(size_t lineNumber, int * dest, char * line) {
-    unimplemented();
+    if (1 != sscanf(line, "%i\n", dest)) {
+        printf("Could not read integer at line %lui.\n", lineNumber);
+        return false;
+    }
+    return true;
 }
 
 bool stepParser(ParserState * state, char * line, void * catcher,
@@ -28,8 +40,9 @@ bool stepParser(ParserState * state, char * line, void * catcher,
                    "Found out-of-place CAT on line %zu.", state->lineNumber);
             return false;
         }
-        char * name = malloc(sizeof(char) * MAX_STRING_LENGTH);
+        char * name = malloc(sizeof(char) * (MAX_STRING_LENGTH + 1));
         strcpy(name, &line[4]);
+        name[strlen(name) - 1] = '\0';
         onCategory(catcher, name);
         return true;
     }
@@ -44,18 +57,17 @@ bool stepParser(ParserState * state, char * line, void * catcher,
 
         switch(state->currentRecordField++) {
         case 0:
-            return readString(state->lineNumber, state->parsedRecord->id, line);
+            return readString(state->lineNumber, PRODUCT_ID_LENGTH, state->parsedRecord->id, line);
         case 1:
             return readInt(state->lineNumber, &state->parsedRecord->instances, line);
         case 2:
-            return readString(state->lineNumber, state->parsedRecord->name, line);
+            return readString(state->lineNumber, MAX_STRING_LENGTH, state->parsedRecord->name, line);
         case 3:
             return readInt(state->lineNumber, &state->parsedRecord->price, line);
         default: {
-            CategoryCode code;
-            if(!readInt(state->lineNumber, &code, line)) return false;
-            state->parsedRecord->category = code;
+            if(!readInt(state->lineNumber, &state->parsedRecord->category, line)) return false;
             onRecord(catcher, state->parsedRecord);
+            state->parsedRecord = NULL;
             return true;
         }
         }

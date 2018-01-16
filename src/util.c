@@ -1,12 +1,35 @@
+int imax(int a, int b) {
+    if (a > b) return a;
+    return b;
+}
+
+int imin(int a, int b) {
+    if (a > b) return b;
+    return a;
+}
+
+
+#include <ncurses.h>
+int getConsoleLines(void) {
+    return LINES;
+}
+
 #include "util.h"
 #include "data.h"
+
+void awaitNewline(size_t n) {
+    size_t x = 0;
+    while(x < n) {
+        x += (getchar() == '\n');
+    }
+}
 
 void unimplemented(void) {
     printf("asjdfjslkdjflkdsa");
 }
 
 void * tryDereference(void ** ptr) {
-    if (!ptr) return NULL;
+    if(!ptr) return NULL;
     return *ptr;
 }
 
@@ -20,7 +43,7 @@ bool lexiographicCompare(void * ptrA, void * ptrB) {
 }
 
 bool priceCompare(void * ptrA, void * ptrB) {
-    return *((Price *) ptrA) <= *((Price *) ptrB);
+    return *((Price *) ptrA) >= *((Price *) ptrB);
 }
 
 void initRandomSeed() {
@@ -32,7 +55,7 @@ int randomIntRange(int low, int high) {
 }
 
 void randomWordFixed(size_t length, char * str) {
-    for (size_t i = 0; i < length; ++i)
+    for(size_t i = 0; i < length; ++i)
         str[i] = (char) randomIntRange((int) 'a', (int) 'z');
     str[length] = '\0';
 }
@@ -41,10 +64,20 @@ void randomWord(char * str) {
     randomWordFixed(randomIntRange(5, MAX_STRING_LENGTH), str);
 }
 
-bool numericCompare(void* dataA, void* dataB) {
+bool numericCompare(void * dataA, void * dataB) {
     return (int *) dataA <= (int *) dataB;
 }
 
 void getRandomName(char name[]) {
 
+}
+
+void fillString(char * dest, char * src, size_t length) {
+    bool overflowing = false;
+    for(size_t i = 0; i < length; ++i) {
+        overflowing = overflowing || src[i] == '\0';
+        if(!overflowing) dest[i] = src[i];
+        else dest[i] = ' ';
+    }
+    dest[length] = '\0';
 }
