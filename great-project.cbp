@@ -60,10 +60,7 @@
 		<Unit filename="include/listing_ui.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
-		<Unit filename="include/menu">
-			<Option target="&lt;{~None~}&gt;" />
-		</Unit>
-		<Unit filename="include/menu.h">
+		<Unit filename="include/interact.h">
 			<Option target="Debug" />
 		</Unit>
 		<Unit filename="include/ordered_list.h">
@@ -95,7 +92,7 @@
 			<Option target="Release" />
 			<Option target="Debug" />
 		</Unit>
-		<Unit filename="src/menu.c">
+		<Unit filename="src/interact.c">
 			<Option compilerVar="CC" />
 			<Option target="Debug" />
 			<Option target="Release" />

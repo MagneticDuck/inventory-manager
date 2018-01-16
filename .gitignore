@@ -5,3 +5,5 @@ bin/
 *.swo
 great-project
 great-project.exe
+great-project.depend
+great-project.layout
