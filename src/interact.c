@@ -1,4 +1,4 @@
-#include "menu.h"
+#include "interact.h"
 #include <curses.h>
 
 #define HEIGHT 20
@@ -55,11 +55,11 @@ void getDisplayLine(
     fillString(lineBuffer, userLine, state->cols);
 }
 
-void scrollScreen(CursesState * curses, ScrollState *state, size_t lineCount, int delta) {
+void scrollScreen(CursesState * curses, ScrollState * state, size_t lineCount, int delta) {
     int target = imin(lineCount - 1, imax(0, state->scroll + state->cursor + delta));
     delta = target - (state->cursor + state->scroll);
-    if (delta + state->cursor > curses->cols - 1) state->cursor = curses->cols - 1;
-    else if (delta + state->cursor < 0) state->cursor = 0;
+    if(delta + state->cursor > curses->cols - 1) state->cursor = curses->cols - 1;
+    else if(delta + state->cursor < 0) state->cursor = 0;
     else state->cursor = target - state->scroll;
     state->scroll = target - state->cursor;
 }
@@ -74,7 +74,7 @@ InteractResult interactVirtual(void * userData,
         // Draw everything.
         // box(state->win, 0, 0);
         for(size_t line = 0; line < curses->lines; line++) {
-            if(line == state->cursor)
+            if(line == state.cursor)
                 wattron(curses->win, A_STANDOUT);
             else
                 wattroff(curses->win, A_STANDOUT);
@@ -100,7 +100,7 @@ InteractResult interactVirtual(void * userData,
         int ch = wgetch(curses->win);
         if(commandMode) {
             if(ch == KEY_BACKSPACE && commandLength > 0) --commandLength;
-            if(ch == ' ' || ('a' <= ch && 'z' >= ch)) state->commandBuffer[commandLength++] = ch;
+            if(ch == ' ' || ('a' <= ch && 'z' >= ch)) curses->commandBuffer[commandLength++] = ch;
             if(ch == 27) {
                 commandMode = false;
                 commandLength = 0;
@@ -108,44 +108,42 @@ InteractResult interactVirtual(void * userData,
             if(ch == '\n') {
                 InteractResult result;
                 result.hasCommand = true;
-                result.command = &state->commandBuffer;
+                result.command = &curses->commandBuffer;
                 result.state = state;
-                result.option = state->cursor + state->scroll;
+                result.option = state.cursor + state.scroll;
                 return result;
             }
-            state->commandBuffer[commandLength] = '\0';
+            curses->commandBuffer[commandLength] = '\0';
             continue;
         }
         switch(ch) {
         case '\n':
             result.hasCommand = false;
             result.state = state;
-            result.option = state->scroll + state->cursor;
+            result.option = state.scroll + state.cursor;
             return result;
         case '/':
             commandMode = true;
             commandLength = 0;
             break;
         case KEY_UP:
-            scrollScreen(state, &cursor, &scroll, lineCount, -1);
+            scrollScreen(curses, &state, lineCount, -1);
             break;
         case KEY_DOWN:
-            scrollScreen(state, &cursor, &scroll, lineCount, 1);
+            scrollScreen(curses, &state, lineCount, 1);
             break;
         case KEY_NPAGE:
-            scrollScreen(state, &cursor, &scroll, lineCount, curses->cols - 1);
+            scrollScreen(curses, &state, lineCount, curses->cols - 1);
             break;
         case KEY_PPAGE:
-            scrollScreen(state, &cursor, &scroll, lineCount, 1 - curses->cols);
+            scrollScreen(curses, &state, lineCount, 1 - curses->cols);
             break;
         case KEY_HOME:
-            cursor = 0;
-            scroll = 0;
+            state = initialScrollState();
             break;
         case KEY_END:
-            cursor = 0;
-            scroll = 0;
-            scrollScreen(state, &cursor, &scroll, lineCount, lineCount - 1);
+            state = initialScrollState();
+            scrollScreen(curses, &state, lineCount, lineCount - 1);
             break;
         default:
             break;
@@ -157,6 +155,6 @@ void concreteGetLine(void * ptr, size_t line, char * buffer) {
     strcpy(buffer, (char *)((char(*) [MAX_STRING_LENGTH]) ptr)[line]);  // oh gosh oh jeez
 }
 
-InteractResult interact(CursesState * state, char lines[][MAX_STRING_LENGTH], size_t lineCount, size_t initialLine) {
-    return interactVirtual((void *) lines, state, &concreteGetLine, lineCount, initialLine);
+InteractResult interact(CursesState * curses, char lines[][MAX_STRING_LENGTH], size_t lineCount, ScrollState state) {
+    return interactVirtual((void *) lines, curses, &concreteGetLine, lineCount, state);
 }

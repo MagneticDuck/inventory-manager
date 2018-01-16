@@ -1,6 +1,0 @@
-#ifndef CURSES_MENU_H_INCLUDED
-#define CURSES_MENU_H_INCLUDED
-
-int
-
-#endif // CURSES_MENU_H_INCLUDED
