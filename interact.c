@@ -1,9 +1,6 @@
 #include "interact.h"
 #include "curses.h"
 
-#define HEIGHT 20
-#define WIDTH 60
-
 typedef struct CursesState {
     WINDOW * win;
     size_t lines, cols;
@@ -28,8 +25,8 @@ ScrollState initialScrollState(void) {
     return state;
 }
 
-ScrollState startScrollAt(CursesState * curses, 
-      size_t line, size_t lineCount) {
+ScrollState startScrollAt(CursesState * curses,
+                          size_t line, size_t lineCount) {
     ScrollState state = initialScrollState();
     scrollScreen(curses, &state, lineCount, line);
     return state;
@@ -65,8 +62,8 @@ void getDisplayLine(
     void (*getLine)(void *, size_t, char *),
     size_t lineCount, int line, char * lineBuffer) {
     if (lineCount == 0 && line == 0) {
-      fillString(lineBuffer, "<empty>", state->cols);
-      return;
+        fillString(lineBuffer, "<empty>", state->cols);
+        return;
     }
     if(line < 0 || line > (int) lineCount - 1) {
         fillString(lineBuffer, "", state->cols);
@@ -117,7 +114,11 @@ InteractResult interactVirtual(void * userData,
         InteractResult result;
         int ch = wgetch(curses->win);
         if(commandMode) {
-            if(ch == '\n') {
+#ifdef WINDOWS_IS_GREAT
+            if(ch == '\r') {
+#else
+            if(ch == '\n')
+#endif
                 InteractResult result;
                 result.hasCommand = true;
                 curses->commandBuffer[commandLength] = '\0';
@@ -126,8 +127,13 @@ InteractResult interactVirtual(void * userData,
                 result.option = state.cursor + state.scroll;
                 return result;
             }
-            if(ch == KEY_BACKSPACE && commandLength > 0) --commandLength;
-            if(ch == ' ' || ('0' <= ch && '9' >= ch) || ('a' <= ch && 'z' >= ch)) curses->commandBuffer[commandLength++] = ch;
+#ifdef WINDOWS_IS_GREAT
+            if((ch == KEY_LEFT || ch == '\b') && commandLength > 0) --commandLength;
+#else
+            if((ch == KEY_LEFT || ch == KEY_BACKSPACE) && commandLength > 0) --commandLength;
+#endif
+            if(ch == ' ' || ('0' <= ch && '9' >= ch) || ('a' <= ch && 'z' >= ch))
+                curses->commandBuffer[commandLength++] = ch;
             if(ch == 27) {
                 commandMode = false;
                 commandLength = 0;
@@ -144,7 +150,11 @@ InteractResult interactVirtual(void * userData,
             result.isQuit = true;
             return result;
         case KEY_RIGHT:
+#ifdef WINDOWS_IS_GREAT
+        case '\r':
+#else
         case '\n':
+#endif
             result.hasCommand = false;
             result.state = state;
             result.option = state.scroll + state.cursor;

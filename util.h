@@ -5,7 +5,9 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdbool.h>
+#include <curses.h>
+#define true 1
+#define false 0
 
 #define PRODUCT_ID_LENGTH 20
 #define MAX_NAME_LENGTH 40

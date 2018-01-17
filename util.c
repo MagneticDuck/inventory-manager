@@ -8,12 +8,6 @@ int imin(int a, int b) {
     return a;
 }
 
-
-#include <ncurses.h>
-int getConsoleLines(void) {
-    return LINES;
-}
-
 #include "util.h"
 #include "data.h"
 
@@ -47,7 +41,10 @@ bool priceCompare(void * ptrA, void * ptrB) {
 }
 
 void initRandomSeed() {
-    // srand(time(NULL));
+#ifdef WINDOWS_IS_GREAT
+#include <time.h>
+    srand(time(NULL));
+#endif
 }
 
 int randomIntRange(int low, int high) {

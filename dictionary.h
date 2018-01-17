@@ -6,6 +6,8 @@
 
 #include "util.h"
 
+// All keys should have same length. Doing a lookup with a partial key will look for keys starting with that prefix.
+
 typedef struct Dictionary Dictionary;
 typedef struct DictionaryEntry DictEntry;
 

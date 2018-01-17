@@ -38,9 +38,20 @@ size_t dictSize(Dictionary *dictionary) {
     return olSize(dictionary->list);
 }
 
+bool isKeyChar_(char * a) {
+    return 'a' <= *a && 'z' >= *a;
+}
+
+bool keysEqual_(char * a, char * b) {
+    do {
+        if (*a != *b) return false;
+    } while (isKeyChar_(++a) && isKeyChar_(++b));
+    return true;
+}
+
 DictionaryEntry * dictLookup(Dictionary * dictionary, char * key) {
     OLNode * closest = olSupremum(dictionary->list, key);
-    if (closest && 0 == strcmp((char *) olKey(closest), key)) return olValue(closest);
+    if (closest && keysEqual_(olKey(closest), key)) return olValue(closest);
     return NULL;
 }
 

@@ -1,0 +1,78 @@
+# depslib dependency file v1.0
+1516176860 source:c:\users\josé\desktop\programacao ii\jdcg\array.c
+	"array.h"
+
+1516176860 c:\users\josé\desktop\programacao ii\jdcg\array.h
+	"util.h"
+
+1516206081 c:\users\josé\desktop\programacao ii\jdcg\util.h
+	<stdio.h>
+	<stddef.h>
+	<stdlib.h>
+	<string.h>
+	<curses.h>
+
+1516176860 source:c:\users\josé\desktop\programacao ii\jdcg\catalog.c
+	"array.h"
+	"catalog.h"
+	"dictionary.h"
+	"ordered_list.h"
+	"data.h"
+
+1516176860 c:\users\josé\desktop\programacao ii\jdcg\catalog.h
+	<stdio.h>
+	"data.h"
+	"util.h"
+	"dictionary.h"
+	"ordered_list.h"
+
+1516176860 c:\users\josé\desktop\programacao ii\jdcg\data.h
+	<stdio.h>
+	"util.h"
+
+1516176860 c:\users\josé\desktop\programacao ii\jdcg\dictionary.h
+	"util.h"
+
+1516176860 c:\users\josé\desktop\programacao ii\jdcg\ordered_list.h
+	"util.h"
+
+1516209141 source:c:\users\josé\desktop\programacao ii\jdcg\data.c
+	"data.h"
+	"util.h"
+
+1516210902 source:c:\users\josé\desktop\programacao ii\jdcg\dictionary.c
+	"dictionary.h"
+	"ordered_list.h"
+
+1516208749 source:c:\users\josé\desktop\programacao ii\jdcg\interact.c
+	"interact.h"
+	"curses.h"
+
+1516176860 c:\users\josé\desktop\programacao ii\jdcg\interact.h
+	"util.h"
+	"data.h"
+
+1516210869 source:c:\users\josé\desktop\programacao ii\jdcg\main.c
+	<stdio.h>
+	<stdlib.h>
+	"catalog.h"
+	"util.h"
+	"interact.h"
+
+1516176860 source:c:\users\josé\desktop\programacao ii\jdcg\ordered_list.c
+	"util.h"
+	"ordered_list.h"
+
+1516208770 source:c:\users\josé\desktop\programacao ii\jdcg\util.c
+	"util.h"
+	"data.h"
+	<time.h>
+
+1516176860 source:c:\users\josé\desktop\programacao ii\jdcg\dummy_main.c
+	"interact.h"
+	"util.h"
+
+1516207107 source:c:\users\josé\desktop\programacao ii\jdcg\test_code.c
+	<curses.h>
+	<stdbool.h>
+
