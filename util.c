@@ -64,10 +64,6 @@ void randomName(char * str) {
     randomWordFixed(randomIntRange(5, MAX_NAME_LENGTH), str);
 }
 
-bool numericCompare(void * dataA, void * dataB) {
-    return (int *) dataA <= (int *) dataB;
-}
-
 void fillString(char * dest, char * src, size_t length) {
     bool overflowing = false;
     for(size_t i = 0; i < length; ++i) {

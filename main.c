@@ -4,8 +4,15 @@
 #include "util.h"
 #include "interact.h"
 
+// Viewing and editing product records.
+void displayRecordDetail(Catalog *, ProductRecord * record, size_t line, char * buffer);
+void tryEditRecordDetail(Catalog *, ProductRecord * record, size_t option, char * command);
+void serveProductEntry(Catalog *, CursesState *, ProductEntry *);
+
+// Product listing interface.
 void serveListing(Catalog *, CursesState *, ListingConfig *, ProductEntry *);
 
+// UI scenes.
 void serveMain(Catalog *, CursesState *);
 void serveSelectListing(Catalog *, CursesState *);
 void serveValues(Catalog *, CursesState *);
@@ -24,6 +31,113 @@ int main(void) {
     freeCatalog(catalog);
     closeCurses(curses);
     return 0;
+}
+
+//// Utilities.
+
+void displayRecordDetail(Catalog * catalog, ProductRecord * record, size_t line, char * buffer) {
+#define FIELD_FORMAT "> %-20s: "
+    switch (line) {
+    case 0:
+        sprintf(buffer, FIELD_FORMAT "%s", "id", record->id);
+        break;
+    case 1:
+        sprintf(buffer, FIELD_FORMAT "%s", "nome", record->name);
+        break;
+    case 2:
+        sprintf(buffer, FIELD_FORMAT "%i", "preco", record->price);
+        break;
+    case 3:
+        sprintf(buffer, FIELD_FORMAT "%i (%s)", "categoria", record->category, catCategoryName(catalog, record->category));
+        break;
+    case 4:
+        sprintf(buffer, FIELD_FORMAT "%i", "no de existencias", record->instances);
+        break;
+    }
+#undef FIELD_FORMAT
+}
+
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic push
+void tryEditRecordDetail(Catalog * catalog, ProductRecord * record, size_t option, char * command) {
+  switch (option) {
+  case 0: // Can't edit ID, sorry :(
+      break;
+  case 1:
+      strcpy(record->name, command);
+      break;
+  case 2:
+      break;
+  case 3:
+      break;
+  case 4:
+      break;
+  }
+}
+#pragma GCC diagnostic pop
+
+typedef struct {
+    Catalog * catalog;
+    ProductEntry * entry;
+} ProductEntryHelper;
+
+void displayProductEntryInterface(void * ptr, size_t line, char * buffer) {
+    ProductEntryHelper * helper = (ProductEntryHelper *) ptr;
+    if (line == 5) sprintf(buffer, "Remover Produto (NAO REVERSIVEL)");
+    if (line < 5) displayRecordDetail(helper->catalog, catProductRecord(helper->entry), line, buffer);
+}
+
+void serveProductEntry(Catalog * catalog, CursesState * curses, ProductEntry * entry) {
+    ProductEntryHelper helper;
+    helper.catalog = catalog; 
+    helper.entry = entry;
+    ScrollState state = initialScrollState(); 
+    loop {
+        InteractResult result = interactVirtual((void *) &helper, curses,
+            &displayProductEntryInterface, 6, state);
+        if (result.hasCommand && result.option < 5) {
+          tryEditRecordDetail(catalog, catProductRecord(entry), result.option, result.command);
+          // catReindexEntry(entry);
+          continue;
+        }
+        /* TODO: deleting products
+        if (!result.hasCommand && result.option == 5) {
+        }
+        */
+        if (result.isQuit) return;
+    }
+}
+
+typedef struct {
+    Catalog * catalog;
+    ListingConfig * config;
+    ProductEntry * currentEntry;
+    size_t currentIndex;
+} ListingHelper;
+
+void displayProducts(void * ptr, size_t line, char * buffer) {
+    ListingHelper * helper = (ListingHelper *) ptr;
+    helper->currentEntry = catSeekBy(helper->config, helper->currentEntry, 
+        (int) line - (int) helper->currentIndex);
+    helper->currentIndex = line;
+    ppRecord(buffer, helper->catalog, helper->currentEntry); 
+}
+
+void serveListing(Catalog * catalog, CursesState * curses, 
+      ListingConfig * config, ProductEntry * entry) {
+    ScrollState state = initialScrollState();
+    loop {
+        ListingHelper helper;
+        helper.catalog = catalog;
+        helper.config = config;
+        helper.currentEntry = entry;
+        helper.currentIndex = 0;
+        InteractResult result = interactVirtual((void *) &helper, curses, &displayProducts, catRecordCount(catalog, config), state);
+        state = result.state;
+        if (result.isQuit) return;
+        if (result.hasCommand) continue; // TODO: seeking and so on
+        serveProductEntry(catalog, curses, catSeekBy(config, helper.currentEntry, (int) result.option - (int) helper.currentIndex));
+    }
 }
 
 //// serveMain
@@ -61,36 +175,6 @@ void serveMain(Catalog * catalog, CursesState * curses) {
         case 5:
             return;
         }
-    }
-}
-
-////
-
-typedef struct {
-    Catalog * catalog;
-    ListingConfig * config;
-    ProductEntry * currentEntry;
-    size_t currentIndex;
-} ListingHelper;
-
-void displayProducts(void * ptr, size_t line, char * buffer) {
-    ListingHelper * helper = (ListingHelper *) ptr;
-    helper->currentEntry = catSeekBy(helper->config, helper->currentEntry, (int) line - (int) helper->currentIndex);
-    helper->currentIndex = line;
-    ppRecord(buffer, helper->catalog, helper->currentEntry); 
-}
-
-void serveListing(Catalog * catalog, CursesState * curses, 
-      ListingConfig * config, ProductEntry * entry) {
-    ScrollState state = initialScrollState();
-    loop {
-        ListingHelper helper;
-        helper.catalog = catalog;
-        helper.config = config;
-        helper.currentEntry = entry;
-        helper.currentIndex = 0;
-        InteractResult result = interactVirtual((void *) &helper, curses, &displayProducts, catRecordCount(catalog, config), state);
-        if (result.isQuit) return;
     }
 }
 
@@ -156,31 +240,9 @@ typedef struct {
   ProductRecord record;
 } AddProductHelper;
 
-void displayRecordDetail(Catalog * catalog, ProductRecord * record, size_t line, char * buffer) {
-#define FIELD_FORMAT "%-20s: "
-    switch (line) {
-    case 0:
-        sprintf(buffer, FIELD_FORMAT "%s", "id", record->id);
-        break;
-    case 1:
-        sprintf(buffer, FIELD_FORMAT "%s", "nome", record->name);
-        break;
-    case 2:
-        sprintf(buffer, FIELD_FORMAT "%i", "preco", record->price);
-        break;
-    case 3:
-        sprintf(buffer, FIELD_FORMAT "%i (%s)", "categoria", record->category, catCategoryName(catalog, record->category));
-        break;
-    case 4:
-        sprintf(buffer, FIELD_FORMAT "%i", "no de existencias", record->instances);
-        break;
-    }
-#undef FIELD_FORMAT
-}
-
 void displayAddProductInterface(void * ptr, size_t line, char * buffer) {
     AddProductHelper * helper = (AddProductHelper *) ptr;
-    if (5 < line) displayRecordDetail(helper->catalog, &helper->record, line, buffer);
+    if (line < 5) displayRecordDetail(helper->catalog, &helper->record, line, buffer);
     if (line == 5) sprintf(buffer, "Concluir e Adicionar");
     if (line == 6) sprintf(buffer, "Cancelar Operacao");
 }
@@ -198,6 +260,7 @@ void serveAddProduct(Catalog * catalog, CursesState * curses) {
   loop {
     InteractResult result = interactVirtual((void *) &helper, curses, &displayAddProductInterface, 7, state);
     state = result.state;
+    if (result.option < 5) tryEditRecordDetail(catalog, &helper.record, result.option, result.command);
     if (result.option == 6 || result.isQuit) return;
     if (result.option == 5) {
       ProductEntry * entry = catAddRecord(catalog, &helper.record);
@@ -215,22 +278,4 @@ void serveAddProduct(Catalog * catalog, CursesState * curses) {
 void serveReadProducts(Catalog * catalog, CursesState * curses) {
 
 }
-
-/*
-void displayData(Catalog * catalog) {
-    CategoryCode mostValuable = catCategoryByRank(catalog, 0);
-    printf("A categoria mais valiosa e %s com %i unidades de preco em total.\n", catCategoryName(catalog, mostValuable), catCategoryValue(catalog, mostValuable));
-    printf("Os tres produtos mais valiosas sao:\n");
-
-    ListingConfig priceConfig;
-    priceConfig.useFilter = 0;
-    priceConfig.orderAlphabetical = false;
-    ProductEntry * valuable = catFirst(catalog, &priceConfig);
-    for(size_t i = 0; i < 3 && valuable; ++i) {
-        ppRecord(catalog, valuable);
-        valuable = catNext(&priceConfig, valuable);
-    }
-}
-*/
-#pragma GCC diagnostic pop
 
