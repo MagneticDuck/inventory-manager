@@ -235,12 +235,23 @@ ProductEntry * catAddRecord(Catalog * catalog, ProductRecord * userRecord) {
 }
 
 void catRegisterRecordEdits(Catalog * catalog, ProductEntry * entry) {
+    // Update value stats, unregister category value sort.
     Price priceDelta = (entry->record->price * entry->record->instances) 
       - (entry->syncedRecord->price * entry->syncedRecord->instances);
     catalog->netValue += priceDelta;
     catCategoryEntry_(catalog, entry->record->category)->netValue += priceDelta;
+    catUnsortCategories_(catalog);
+
+    // Reindex ordered lists.
     copyRecord(entry->syncedRecord, entry->record);
-    // TODO: reindex in ordered lists
+    olReindex(catalog->productsByPrice[0], 
+        entry->byPrice[0], &entry->syncedRecord->price);
+    olReindex(catalog->productsByPrice[entry->record->category + 1], 
+        entry->byPrice[1], &entry->syncedRecord->price);
+    olReindex(catalog->productsByName[0],
+         entry->byName[0], &entry->syncedRecord->name);
+    olReindex(catalog->productsByName[entry->record->category + 1],
+         entry->byName[1], &entry->syncedRecord->name);
 }
 
 void catUndoRecordEdits(ProductEntry * entry) {
@@ -249,10 +260,12 @@ void catUndoRecordEdits(ProductEntry * entry) {
 
 void catRemove(Catalog * catalog, ProductEntry * entry) {
     dictRemove(catalog->productsById, entry->byId);
-    for(CategoryCode i = 0; i <= catCategoryCount(catalog); ++i) {
-        olRemove(catalog->productsByName[i], entry->byName[i]);
-        olRemove(catalog->productsByPrice[i], entry->byPrice[i]);
-    }
+    olRemove(catalog->productsByName[0], entry->byName[0]);
+    olRemove(catalog->productsByName[entry->record->category], 
+        entry->byName[1]);
+    olRemove(catalog->productsByPrice[0], entry->byPrice[0]);
+    olRemove(catalog->productsByPrice[entry->record->category], 
+        entry->byPrice[1]);
     free(entry->record);
     free(entry->syncedRecord);
 }

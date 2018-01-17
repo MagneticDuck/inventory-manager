@@ -7,7 +7,7 @@
 // Viewing and editing product records.
 void displayRecordDetail(Catalog *, ProductRecord * record, size_t line, char * buffer);
 void tryEditRecordDetail(Catalog *, ProductRecord * record, size_t option, char * command, bool lockFields);
-void serveProductEntry(Catalog *, CursesState *, ProductEntry *);
+bool serveProductEntry(Catalog *, CursesState *, ProductEntry *);
 
 // Product listing interface.
 void serveListing(Catalog *, CursesState *, ListingConfig *, ProductEntry *);
@@ -99,7 +99,7 @@ void displayProductEntryInterface(void * ptr, size_t line, char * buffer) {
     if (line == 7) sprintf(buffer, "Remover Produto (NAO REVERSIVEL)");
 }
 
-void serveProductEntry(Catalog * catalog, CursesState * curses, ProductEntry * entry) {
+bool serveProductEntry(Catalog * catalog, CursesState * curses, ProductEntry * entry) {
     ProductEntryHelper helper;
     helper.catalog = catalog; 
     helper.entry = entry;
@@ -114,17 +114,15 @@ void serveProductEntry(Catalog * catalog, CursesState * curses, ProductEntry * e
         }
         if (result.option == 5)  {
           catRegisterRecordEdits(catalog, entry);
-          return;
+          return false;
         }
         if (result.isQuit || result.option == 6)  {
           catUndoRecordEdits(entry);
-          return;
+          return false;
         }
-        /*
         if (!result.hasCommand && result.option == 7) {
-          TODO (maybe return a value for serveListing to consider)
+          return true;
         }
-        */
     }
 }
 
@@ -145,6 +143,7 @@ void displayProducts(void * ptr, size_t line, char * buffer) {
 
 void serveListing(Catalog * catalog, CursesState * curses, 
       ListingConfig * config, ProductEntry * entry) {
+start:
     if (!entry) {
         loop {
             InteractResult result = interact(curses, NULL, 0, initialScrollState());
@@ -163,7 +162,17 @@ void serveListing(Catalog * catalog, CursesState * curses,
         state = result.state;
         if (result.isQuit) return;
         if (result.hasCommand) continue; // TODO: seeking and so on
-        serveProductEntry(catalog, curses, catSeekBy(config, helper.currentEntry, (int) result.option - (int) helper.currentIndex));
+        else {
+          if (serveProductEntry(catalog, curses, catSeekBy(config, helper.currentEntry, (int) result.option - (int) helper.currentIndex))) {
+              // jump off and then delete the current entry
+              ProductEntry * oldEntry = entry;
+              if (catNext(config, entry)) entry = catNext(config, entry);
+              else if (catPrev(config,entry)) entry = catPrev(config, entry);
+              else entry = NULL;
+              catRemove(catalog, oldEntry);
+          }
+          goto start;
+        }
     }
 }
 
