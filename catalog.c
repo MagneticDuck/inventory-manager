@@ -79,14 +79,8 @@ bool onReadCategory_(void * ptr, char * name) {
     return true;
 }
 
-bool onReadRecord_(void * ptr, ProductRecord * record) {
-    Catalog * catalog = (Catalog *) ptr;
-
-    if(record->category > catCategoryCount(catalog)) {
-        printf("Category code out of bounds!\n");
-        return false;
-    }
-
+// Just copy the record pointer.
+ProductEntry * catAddRecord_(Catalog * catalog, ProductRecord * record) {
     // Make entry.
     ProductEntry * entry = malloc(sizeof(ProductEntry));
     entry->record = record;
@@ -102,6 +96,18 @@ bool onReadRecord_(void * ptr, ProductRecord * record) {
     CategoryEntry * catEntry = catCategoryEntry_(catalog, record->category);
     catalog->netValue += record->price * record->instances;
     catEntry->netValue += record->price * record->instances;
+    return entry;
+}
+
+bool onReadRecord_(void * ptr, ProductRecord * record) {
+    Catalog * catalog = (Catalog *) ptr;
+
+    if(record->category > catCategoryCount(catalog)) {
+        printf("Category code out of bounds!\n");
+        return false;
+    }
+
+    catAddRecord_(catalog, record);
     return true;
 }
 
@@ -175,8 +181,7 @@ void ppRecord(char * string, Catalog * catalog, ProductEntry * entry) {
     if (entry == NULL) sprintf(string, "<NULL>");
     else {
         ProductRecord * record = catProductRecord(entry);
-        // MAX_NAME_LENGTH
-        sprintf(string, "%s | %-40s | %-5i | (%-5i em stock) | %s", 
+        sprintf(string, "%s | " FORMAT_NAME " | %-5i | (%-5i em stock) | %s", 
           record->id, record->name,
           record->price, record->instances,
           catCategoryName(catalog, record->category));
@@ -211,6 +216,16 @@ ProductEntry * catLookupProduct(Catalog * catalog, ProductId id) {
 
 ProductRecord * catProductRecord(ProductEntry * product) {
     return product->record;
+}
+
+ProductEntry * catAddRecord(Catalog * catalog, ProductRecord * userRecord) {
+    ProductRecord * record = malloc(sizeof(ProductRecord));
+    strcpy(record->id, userRecord->id);
+    strcpy(record->name, userRecord->name);
+    record->price = userRecord->price;
+    record->category = userRecord->category;
+    record->instances = userRecord->instances;
+    return catAddRecord(catalog, record);
 }
 
 void catRemove(Catalog * catalog, ProductEntry * entry) {

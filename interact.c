@@ -47,6 +47,10 @@ void getDisplayLine(
     void * userData, CursesState * state,
     void (*getLine)(void *, size_t, char *),
     size_t lineCount, int line, char * lineBuffer) {
+    if (lineCount == 0 && line == 0) {
+      fillString(lineBuffer, "<empty>", state->cols);
+      return;
+    }
     if(line < 0 || line > (int) lineCount - 1) {
         fillString(lineBuffer, "", state->cols);
         return;
@@ -58,6 +62,7 @@ void getDisplayLine(
 }
 
 void scrollScreen(CursesState * curses, ScrollState * state, size_t lineCount, int delta) {
+    if (lineCount == 0) return;
     int target = imin(lineCount - 1, imax(0, state->scroll + state->cursor + delta));
     delta = target - (state->cursor + state->scroll);
     if(delta + (int) state->cursor > (int) curses->lines - 1) state->cursor = curses->lines - 1;

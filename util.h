@@ -9,6 +9,7 @@
 
 #define PRODUCT_ID_LENGTH 20
 #define MAX_NAME_LENGTH 40
+#define FORMAT_NAME "%-40s"
 #define MAX_CATEGORIES 100
 #define MAX_STRING_LENGTH 200
 

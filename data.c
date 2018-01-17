@@ -9,7 +9,6 @@ typedef struct {
     ProductRecord * parsedRecord;
 } ParserState;
 
-// Sanitize maybe?
 bool readString(size_t lineNumber, size_t maxLength, char * dest, char * line) {
     size_t length = strlen(line); // MICROSOFT NEWLINES!! on windows we need to cut off two characters from the end
     if (length - 1 > maxLength) {
@@ -21,7 +20,6 @@ bool readString(size_t lineNumber, size_t maxLength, char * dest, char * line) {
     return true;
 }
 
-// Return true if things went well, otherwise display a message with lineNumber and return false.
 bool readInt(size_t lineNumber, int * dest, char * line) {
     if (1 != sscanf(line, "%i\n", dest)) {
         printf("Could not read integer at line %lu.\n", lineNumber);
@@ -54,6 +52,10 @@ bool stepParser(ParserState * state, char * line, void * catcher,
 
     // Record field definition?
     {
+        if (state->definingCategories == true && state->lineNumber == 1) {
+            printf("At least one category definition is required.\n");
+            return false;
+        }
         state->definingCategories = false;
         if(!state->parsedRecord) {
             state->currentRecordField = 0;
@@ -122,6 +124,10 @@ bool readRandomCatalog(
     size_t categoryCount, size_t recordCount, void * catcher,
     bool (* onReadCategory)(void *, char *),
     bool (* onReadRecord)(void *, ProductRecord *)) {
+    if (categoryCount == 0) {
+        printf("At least one category is required.\n");
+        return false;
+    }
     for(size_t i = 0; i < categoryCount; ++i) {
         char * name = malloc(sizeof(char) * MAX_STRING_LENGTH);
         randomName(name);
@@ -147,7 +153,7 @@ bool writeFile(
     bool (popRecord)(void *, ProductRecord **)) {
     FILE * file = fopen(filepath, "w");
     if(!file) {
-        printf("Could not open file for writing!");
+        printf("Could not open file for writing.\n");
         return false;
     }
     {

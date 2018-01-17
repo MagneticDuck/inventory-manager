@@ -36,6 +36,7 @@ CategoryCode catCategoryByRank(Catalog *, size_t place);
 
 ProductEntry * catLookupProduct(Catalog * catalog, ProductId id);
 ProductRecord * catProductRecord(ProductEntry * product);
+ProductEntry * catAddRecord(Catalog * catalog, ProductRecord * record); // copies data
 void catRemove(Catalog *, ProductEntry *);
 
 // Listing the products.
