@@ -6,7 +6,7 @@
 
 // Viewing and editing product records.
 void displayRecordDetail(Catalog *, ProductRecord * record, size_t line, char * buffer);
-void tryEditRecordDetail(Catalog *, ProductRecord * record, size_t option, char * command);
+void tryEditRecordDetail(Catalog *, ProductRecord * record, size_t option, char * command, bool lockFields);
 void serveProductEntry(Catalog *, CursesState *, ProductEntry *);
 
 // Product listing interface.
@@ -17,7 +17,6 @@ void serveMain(Catalog *, CursesState *);
 void serveSelectListing(Catalog *, CursesState *);
 void serveValues(Catalog *, CursesState *);
 void serveAddProduct(Catalog *, CursesState *);
-void serveReadProducts(Catalog *, CursesState *);
 
 int main(void) {
     Catalog * catalog;
@@ -59,20 +58,31 @@ void displayRecordDetail(Catalog * catalog, ProductRecord * record, size_t line,
 
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #pragma GCC diagnostic push
-void tryEditRecordDetail(Catalog * catalog, ProductRecord * record, size_t option, char * command) {
-  switch (option) {
-  case 0: // Can't edit ID, sorry :(
-      break;
-  case 1:
-      strcpy(record->name, command);
-      break;
-  case 2:
-      break;
-  case 3:
-      break;
-  case 4:
-      break;
-  }
+void tryEditRecordDetail(Catalog * catalog, ProductRecord * record, size_t option, char * command, bool lockFields) {
+    switch (option) {
+    case 0: // Can't edit ID, sorry :(
+        break;
+    case 1:
+        strcpy(record->name, command);
+        break;
+    case 2: {
+        Price price;
+        if (sscanf(command, "%i", &price) == 1) record->price = price;
+        break;
+    }
+    case 3: {
+        if (lockFields) break;
+        CategoryCode category;
+        if (sscanf(command, "%i", &category) && category >= 0 && category < catCategoryCount(catalog)) 
+            record->category = category;
+        break;
+    }
+    case 4: {
+        size_t instances; 
+        if (sscanf(command, "%lu", &instances) == 1) record->instances = instances;
+        break;
+    }
+    }
 }
 #pragma GCC diagnostic pop
 
@@ -97,7 +107,7 @@ void serveProductEntry(Catalog * catalog, CursesState * curses, ProductEntry * e
             &displayProductEntryInterface, 6, state);
         state = result.state;
         if (result.hasCommand && result.option < 5) {
-          tryEditRecordDetail(catalog, catProductRecord(entry), result.option, result.command);
+          tryEditRecordDetail(catalog, catProductRecord(entry), result.option, result.command, true);
           catRegisterRecordEdits(catalog, entry);
           continue;
         }
@@ -151,7 +161,7 @@ void serveMain(Catalog * catalog, CursesState * curses) {
           {"Ver / Editar Produtos",           // 0
            "Consultar Valores Totais",        // 1
            "Introduzir um Novo Produto",      // 2
-           "Ler Novos Produtos dum Ficheiro", // 3
+           "Guardar", // 3
            "Guardar e Sair",                  // 4
            "Sair sem Guardar"                 // 5
           };
@@ -169,7 +179,7 @@ void serveMain(Catalog * catalog, CursesState * curses) {
             serveAddProduct(catalog, curses);
             break;
         case 3:
-            serveReadProducts(catalog, curses);
+            writeCatalog(catalog, "data/user.txt");
             break;
         case 4:
             writeCatalog(catalog, "data/user.txt");
@@ -214,10 +224,6 @@ void serveSelectListing(Catalog * catalog, CursesState * curses) {
 
 //// serveValues
 
-#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-#pragma GCC diagnostic push
 void displayValues(void * ptr, size_t line, char * buffer) {
     Catalog *catalog = (Catalog *) ptr;
     if (line == 0) sprintf(buffer, FORMAT_NAME ": %i", "(em total)", catTotalValue(catalog));
@@ -231,6 +237,7 @@ void serveValues(Catalog * catalog, CursesState * curses) {
     ScrollState state = initialScrollState();
     loop {
         InteractResult result = interactVirtual((void *) catalog, curses, &displayValues, catCategoryCount(catalog) + 1, state);
+        state = result.state;
         if (result.isQuit) return;
     }    
 }
@@ -262,7 +269,7 @@ void serveAddProduct(Catalog * catalog, CursesState * curses) {
   loop {
     InteractResult result = interactVirtual((void *) &helper, curses, &displayAddProductInterface, 7, state);
     state = result.state;
-    if (result.command && result.option < 5) tryEditRecordDetail(catalog, &helper.record, result.option, result.command);
+    if (result.command && result.option < 5) tryEditRecordDetail(catalog, &helper.record, result.option, result.command, false);
     if (result.option == 6 || result.isQuit) return;
     if (result.option == 5) {
       ProductEntry * entry = catAddRecord(catalog, &helper.record);
@@ -273,11 +280,5 @@ void serveAddProduct(Catalog * catalog, CursesState * curses) {
       return;
     }
   }
-}
-
-//// serveReadProducts
-
-void serveReadProducts(Catalog * catalog, CursesState * curses) {
-
 }
 
