@@ -163,13 +163,14 @@ start:
         if (result.isQuit) return;
         if (result.hasCommand) continue; // TODO: seeking and so on
         else {
-          if (serveProductEntry(catalog, curses, catSeekBy(config, helper.currentEntry, (int) result.option - (int) helper.currentIndex))) {
-              // jump off and then delete the current entry
-              ProductEntry * oldEntry = entry;
+          entry = catSeekBy(config, helper.currentEntry, (int) result.option - (int) helper.currentIndex); 
+          if (serveProductEntry(catalog, curses, entry)) {
+              // jump off and delete
+              ProductEntry * dangling = entry;
               if (catNext(config, entry)) entry = catNext(config, entry);
-              else if (catPrev(config,entry)) entry = catPrev(config, entry);
+              else if (catPrev(config, entry)) entry = catPrev(config, entry);
               else entry = NULL;
-              catRemove(catalog, oldEntry);
+              catRemove(catalog, dangling);
           }
           goto start;
         }
@@ -224,11 +225,13 @@ void displayCategoryFilters(void * ptr, size_t line, char * buffer) {
 
 void serveSelectListing(Catalog * catalog, CursesState * curses) {
     ListingConfig config;
+    ScrollState state = initialScrollState();
     loop {
         loop {
             InteractResult result = 
                 interactVirtual((void *) catalog, curses, &displayCategoryFilters, 
-                  catCategoryCount(catalog) + 1, initialScrollState());
+                  catCategoryCount(catalog) + 1, state);
+            state = result.state;
             if(result.isQuit) return;
             if(result.option == 0) config.useFilter = false;
             else {
@@ -290,7 +293,7 @@ void serveAddProduct(Catalog * catalog, CursesState * curses) {
   AddProductHelper helper;
   helper.catalog = catalog;
   randomWordFixed(20, helper.record.id);
-  strcpy(helper.record.name, "NAME");
+  strcpy(helper.record.name, "");
   helper.record.price = 0;
   helper.record.category = 0;
   helper.record.instances = 0;

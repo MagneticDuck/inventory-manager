@@ -177,5 +177,6 @@ bool writeFile(
 #undef STRING
 #undef INT
     }
+    fclose(file);
     return true;
 }

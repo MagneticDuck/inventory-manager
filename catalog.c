@@ -102,10 +102,11 @@ ProductEntry * catAddRecord_(Catalog * catalog, ProductRecord * record) {
     entry->byName[1] = olAdd(catalog->productsByName[record->category + 1], (void *) record->name, (void *) entry);
     entry->byPrice[1] = olAdd(catalog->productsByPrice[record->category + 1], (void *) &record->price, (void *) entry);
 
-    // Update value counters.
+    // Update value counters and unregister category sort.
     CategoryEntry * catEntry = catCategoryEntry_(catalog, record->category);
     catalog->netValue += record->price * record->instances;
     catEntry->netValue += record->price * record->instances;
+    catUnsortCategories_(catalog);
     return entry;
 }
 
@@ -259,13 +260,22 @@ void catUndoRecordEdits(ProductEntry * entry) {
 }
 
 void catRemove(Catalog * catalog, ProductEntry * entry) {
+    // Update value stats, unregister category value sort.
+    Price priceDelta = entry->record->price * entry->record->instances;
+    catalog->netValue -= priceDelta;
+    catCategoryEntry_(catalog, entry->record->category)->netValue -= priceDelta;
+    catUnsortCategories_(catalog);
+
+    // Remove from indexing structures.
     dictRemove(catalog->productsById, entry->byId);
     olRemove(catalog->productsByName[0], entry->byName[0]);
-    olRemove(catalog->productsByName[entry->record->category], 
+    olRemove(catalog->productsByName[entry->record->category + 1], 
         entry->byName[1]);
     olRemove(catalog->productsByPrice[0], entry->byPrice[0]);
-    olRemove(catalog->productsByPrice[entry->record->category], 
+    olRemove(catalog->productsByPrice[entry->record->category + 1], 
         entry->byPrice[1]);
+
+    // Free memory.
     free(entry->record);
     free(entry->syncedRecord);
 }
