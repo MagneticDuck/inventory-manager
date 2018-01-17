@@ -39,7 +39,7 @@ void serveMain(Catalog * catalog, CursesState * curses) {
           };
         InteractResult result = interact(curses, menu, 6, state);
         state = result.state;
-        if (result.isQuit) continue;
+        if (result.hasCommand || result.isQuit) continue;
         switch(result.option) {
         case 0:
             serveListing(catalog, curses);
@@ -49,9 +49,10 @@ void serveMain(Catalog * catalog, CursesState * curses) {
             break;
         case 2:
             serveAddProduct(catalog, curses);
-            return;
+            break;
         case 3:
             serveReadProducts(catalog, curses);
+            break;
         case 4:
             writeCatalog(catalog, "data/user.txt");
             return;
@@ -78,38 +79,59 @@ typedef struct {
 
 void displayProducts(void * ptr, size_t line, char * buffer) {
     ListingHelper * helper = (ListingHelper *) ptr;
-    helper->currentEntry = catSeekBy(helper->config, helper->currentEntry, line - helper->currentIndex);
-    sprintf(buffer, "product %s", catProductRecord(helper->currentEntry)->name);
+    helper->currentEntry = catSeekBy(helper->config, helper->currentEntry, (int) line - (int) helper->currentIndex);
+    helper->currentIndex = line;
+    ppRecord(buffer, helper->catalog, helper->currentEntry); 
 }
 
-void serveListing(Catalog * catalog, CursesState * state) {
-#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
-#pragma GCC diagnostic push
+void serveListing(Catalog * catalog, CursesState * curses) {
     ListingConfig config;
 start:
     loop {
-        InteractResult result = interactVirtual((void *) catalog, state, &displayCategoryFilters, catCategoryCount(catalog), initialScrollState());
+        InteractResult result = interactVirtual((void *) catalog, curses, &displayCategoryFilters, catCategoryCount(catalog), initialScrollState());
         if(result.isQuit) return;
         if(result.option == 0) config.useFilter = false;
         else {
             config.useFilter = true;
             config.categoryFilter = result.option - 1;
         }
+        break;
     }
     loop {
-        char sortMenu[3][MAX_STRING_LENGTH] = {"Ordenar alfabeticamente", "Ordenar por precos"};
-        InteractResult result = interact(state, sortMenu, 3, initialScrollState());
+        char sortMenu[2][MAX_STRING_LENGTH] = {"Ordenar alfabeticamente", "Ordenar por precos"};
+        InteractResult result = interact(curses, sortMenu, 2, initialScrollState());
         if(result.isQuit) goto start;
+        config.orderAlphabetical = result.option == 0;
+
+        ScrollState state = initialScrollState();
+        loop {
+          ListingHelper helper;
+          helper.catalog = catalog;
+          helper.config = &config;
+          helper.currentEntry = catFirst(catalog, &config);
+          helper.currentIndex = 0;
+          InteractResult result = interactVirtual((void *) &helper, curses, &displayProducts, catRecordCount(catalog, &config), state);
+          if (result.isQuit) goto start;
+        }
         return;
     }
 }
 
 //// serveValues
 
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #pragma GCC diagnostic push
+void displayValues(void * ptr, size_t line, char * buffer) {
+    Catalog *catalog = (Catalog *) ptr;
+    if (line == 0) sprintf(buffer, "(em total): %i", catTotalValue(catalog));
+}
+
 void serveValues(Catalog * catalog, CursesState * state) {
-     
+    ScrollState state = initial
+    loop {
+    }    
 }
 
 //// serveAddProduct

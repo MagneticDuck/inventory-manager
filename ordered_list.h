@@ -1,6 +1,5 @@
 /**
  * Abstract ordered data type containing a list of key-value pairs. The sequence of keys is ordered with respect to an ordering function.
- * An underlying skiplist data structure allows for fast seeking and edit operations.
  */
 #ifndef ORDERED_LIST_H_INCLUDED
 #define ORDERED_LIST_H_INCLUDED

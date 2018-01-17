@@ -52,7 +52,7 @@ void getDisplayLine(
         return;
     }
 
-    char userLine[MAX_STRING_LENGTH];
+    char userLine[MAX_STRING_LENGTH + 1];
     getLine(userData, line, userLine);
     fillString(lineBuffer, userLine, state->cols);
 }
@@ -91,7 +91,7 @@ InteractResult interactVirtual(void * userData,
             wattroff(curses->win, A_STANDOUT);
         }
         if(commandMode) {
-            char lineBuffer[curses->cols];
+            char lineBuffer[curses->cols + 1];
             fillString(lineBuffer, curses->commandBuffer, curses->cols - 1);
             mvwprintw(curses->win, curses->lines + 1, 1, "/%s", lineBuffer);
         } else {
@@ -108,18 +108,19 @@ InteractResult interactVirtual(void * userData,
             if(ch == '\n') {
                 InteractResult result;
                 result.hasCommand = true;
+                curses->commandBuffer[commandLength] = '\0';
                 result.command = curses->commandBuffer;
                 result.state = state;
                 result.option = state.cursor + state.scroll;
                 return result;
             }
             if(ch == KEY_BACKSPACE && commandLength > 0) --commandLength;
-            if(ch == ' ' || ('0' <= ch && '9' <= ch) || ('a' <= ch && 'z' >= ch)) curses->commandBuffer[commandLength++] = ch;
+            if(ch == ' ' || ('0' <= ch && '9' >= ch) || ('a' <= ch && 'z' >= ch)) curses->commandBuffer[commandLength++] = ch;
             if(ch == 27) {
                 commandMode = false;
                 commandLength = 0;
             }
-            curses->commandBuffer[commandLength] = '\0';
+            strcpy(curses->commandBuffer + commandLength, "_");
             continue;
         }
         switch(ch) {
@@ -137,7 +138,7 @@ InteractResult interactVirtual(void * userData,
         case '/':
             commandMode = true;
             commandLength = 0;
-            curses->commandBuffer[0] = '\0';
+            strcpy(curses->commandBuffer, "_");
             break;
         case KEY_UP:
             scrollScreen(curses, &state, lineCount, -1);

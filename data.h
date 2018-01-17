@@ -6,7 +6,6 @@
 #include <stdio.h>
 #include "util.h"
 
-
 typedef char ProductId[PRODUCT_ID_LENGTH + 1];
 typedef char ProductName[MAX_STRING_LENGTH + 1];
 typedef char CategoryName[MAX_STRING_LENGTH + 1];

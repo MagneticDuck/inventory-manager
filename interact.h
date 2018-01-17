@@ -1,3 +1,6 @@
+/**
+ * Simple, uniform curses-based console interface.
+ */
 #ifndef MENU_INCLUDED
 #define MENU_INCLUDED
 #include "util.h"

@@ -8,8 +8,9 @@
 #include <stdbool.h>
 
 #define PRODUCT_ID_LENGTH 20
+#define MAX_NAME_LENGTH 40
 #define MAX_CATEGORIES 100
-#define MAX_STRING_LENGTH 50
+#define MAX_STRING_LENGTH 200
 
 int imax(int a, int b);
 int imin(int a, int b);
@@ -30,7 +31,7 @@ bool priceCompare(void * dataA, void * dataB); // Pointers to Price.
 void initRandomSeed();
 int randomIntRange(int low, int high);
 void randomWordFixed(size_t length, char *);
-void randomWord(char *);
+void randomName(char *);
 
 void fillString(char * dest, char * src, size_t length);
 

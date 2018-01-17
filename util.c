@@ -60,23 +60,21 @@ void randomWordFixed(size_t length, char * str) {
     str[length] = '\0';
 }
 
-void randomWord(char * str) {
-    randomWordFixed(randomIntRange(5, MAX_STRING_LENGTH), str);
+void randomName(char * str) {
+    randomWordFixed(randomIntRange(5, MAX_NAME_LENGTH), str);
 }
 
 bool numericCompare(void * dataA, void * dataB) {
     return (int *) dataA <= (int *) dataB;
 }
 
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-#pragma GCC diagnostic push
 void fillString(char * dest, char * src, size_t length) {
     bool overflowing = false;
     for(size_t i = 0; i < length; ++i) {
       dest[i] = '_';
         overflowing = overflowing || src[i] == '\0';
         if(!overflowing) dest[i] = src[i];
-        else dest[i] = '_';
+        else dest[i] = ' ';
     }
     dest[length] = '\0';
 }

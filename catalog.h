@@ -11,13 +11,7 @@
 #include "dictionary.h"
 #include "ordered_list.h"
 
-typedef struct ProductEntry {
-    ProductRecord * record;
-    DictEntry * byId;
-    OLNode * byName[2];
-    OLNode * byPrice[2];
-} ProductEntry;
-
+typedef struct ProductEntry ProductEntry; 
 typedef struct Catalog Catalog;
 
 // Lifetime management and file IO.
@@ -32,9 +26,9 @@ void writeCatalog(Catalog * catalog, char * filepath);
 
 void ppRecord(char * string, Catalog * catalog, ProductEntry * entry);
 
-size_t catRecordCount(Catalog *);
 CategoryCode catCategoryCount(Catalog *);
 char * catCategoryName(Catalog *, CategoryCode);
+Price catTotalValue(Catalog *);
 Price catCategoryValue(Catalog *, CategoryCode);
 CategoryCode catCategoryByRank(Catalog *, size_t place);
 
@@ -54,6 +48,7 @@ typedef struct {
 
 ListingConfig * NULL_CONFIG(void);
 
+size_t catRecordCount(Catalog *, ListingConfig * config);
 ProductEntry * catFirst(Catalog *, ListingConfig *);
 ProductEntry * catLast(Catalog *, ListingConfig *);
 ProductEntry * catNext(ListingConfig *, ProductEntry *);

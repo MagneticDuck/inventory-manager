@@ -1,7 +1,6 @@
+#include "interact.h"
+#include "util.h"
 
-
-/* 
-// technical ncurses demo
 int main(void) {
     CursesState * curses = openCurses();
     char list[200][MAX_STRING_LENGTH];
@@ -18,4 +17,3 @@ int main(void) {
 
     closeCurses(curses);
 }
-*/

@@ -4,6 +4,13 @@
 #include "ordered_list.h"
 #include "data.h"
 
+typedef struct ProductEntry {
+    ProductRecord * record;
+    DictEntry * byId;
+    OLNode * byName[2];
+    OLNode * byPrice[2];
+} ProductEntry;
+
 ListingConfig * NULL_CONFIG(void) {
     static ListingConfig config; // static!
     config.useFilter = false;
@@ -23,16 +30,10 @@ void freeCategoryEntry_(CategoryEntry * entry) {
     free(entry->name);
     free(entry);
 }
-/*
-typedef struct ProductEntry {
-    ProductRecord * record;
-    DictEntry * byId;
-    OLNode * byName[2];
-    OLNode * byPrice[2];
-} ProductEntry;
-*/
 
 typedef struct Catalog {
+    Price netValue;
+  
     // Index CategoryEntry.
     Array * categoriesByCode;
     OrderedList * categoriesByValue; // NULL unless requested
@@ -97,8 +98,9 @@ bool onReadRecord_(void * ptr, ProductRecord * record) {
     entry->byName[1] = olAdd(catalog->productsByName[record->category + 1], (void *) record->name, (void *) entry);
     entry->byPrice[1] = olAdd(catalog->productsByPrice[record->category + 1], (void *) &record->price, (void *) entry);
 
-    // Update category net value.
+    // Update value counters.
     CategoryEntry * catEntry = catCategoryEntry_(catalog, record->category);
+    catalog->netValue += record->price * record->instances;
     catEntry->netValue += record->price * record->instances;
     return true;
 }
@@ -106,6 +108,8 @@ bool onReadRecord_(void * ptr, ProductRecord * record) {
 void newCatalog_(Catalog ** catalog) {
     *catalog = malloc(sizeof(Catalog));
     Catalog * catalog_ = *catalog;
+  
+    catalog_->netValue = 0;
 
     catalog_->categoriesByCode = newArray(MAX_CATEGORIES);
     catalog_->categoriesByValue = NULL;
@@ -168,15 +172,15 @@ void writeCatalog(Catalog * catalog, char * filepath) {
 }
 
 void ppRecord(char * string, Catalog * catalog, ProductEntry * entry) {
-    ProductRecord * record = catProductRecord(entry);
-    sprintf(string, "%s | %-50s | %-20s | %-3i | %-3i\n", 
-            record->id, record->name,
-            catCategoryName(catalog, record->category),
-            record->price, record->instances);
-}
-
-size_t catRecordCount(Catalog * catalog) {
-    return dictSize(catalog->productsById);
+    if (entry == NULL) sprintf(string, "<NULL>");
+    else {
+        ProductRecord * record = catProductRecord(entry);
+        // MAX_NAME_LENGTH
+        sprintf(string, "%s | %-40s | %-5i | (%-5i em stock) | %s", 
+          record->id, record->name,
+          record->price, record->instances,
+          catCategoryName(catalog, record->category));
+    }
 }
 
 CategoryCode catCategoryCount(Catalog * catalog) {
@@ -185,6 +189,10 @@ CategoryCode catCategoryCount(Catalog * catalog) {
 
 char * catCategoryName(Catalog * catalog, CategoryCode code) {
     return catCategoryEntry_(catalog, code)->name;
+}
+
+Price catTotalValue(Catalog * catalog) {
+  return catalog->netValue;
 }
 
 Price catCategoryValue(Catalog * catalog, CategoryCode code) {
@@ -227,6 +235,10 @@ OrderedList * getRelevantList_(Catalog * catalog, ListingConfig * config) {
     else index = catalog->productsByPrice;
     if(!config->useFilter) return index[0];
     else return index[config->categoryFilter + 1];
+}
+
+size_t catRecordCount(Catalog * catalog, ListingConfig * config) {
+    return olSize(getRelevantList_(catalog, config));
 }
 
 ProductEntry * catFirst(Catalog * catalog, ListingConfig * config) {

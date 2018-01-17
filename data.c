@@ -1,4 +1,5 @@
 #include "data.h"
+#include "util.h"
 
 typedef struct {
     size_t lineNumber;
@@ -10,20 +11,20 @@ typedef struct {
 
 // Sanitize maybe?
 bool readString(size_t lineNumber, size_t maxLength, char * dest, char * line) {
-    size_t length = strlen(line);
-    if (length > maxLength + 1) {
-        printf("String on line %lui is longer than maximum length!\n", lineNumber);
+    size_t length = strlen(line); // MICROSOFT NEWLINES!! on windows we need to cut off two characters from the end
+    if (length - 1 > maxLength) {
+        printf("String on line %lui is longer than maximum length of %lu.\n", lineNumber, maxLength);
         return false;
     }
-    memcpy(dest, line, length - 2);
-    line[length - 2] = '\0';
+    memcpy(dest, line, length - 1);
+    line[length - 1] = '\0';
     return true;
 }
 
 // Return true if things went well, otherwise display a message with lineNumber and return false.
 bool readInt(size_t lineNumber, int * dest, char * line) {
     if (1 != sscanf(line, "%i\n", dest)) {
-        printf("Could not read integer at line %lui.\n", lineNumber);
+        printf("Could not read integer at line %lu.\n", lineNumber);
         return false;
     }
     return true;
@@ -36,11 +37,15 @@ bool stepParser(ParserState * state, char * line, void * catcher,
     // Category definition?
     if(strncmp(line, "CAT ", 4) == 0) {
         if(!state->definingCategories) {
-            printf("Category definitions are not consecutive and at start of file!\n"
-                   "Found out-of-place CAT on line %zu.", state->lineNumber);
+            printf("Category definitions are not consecutive and at start of file.\n"
+                   "Found out-of-place CAT on line %zu.\n", state->lineNumber);
             return false;
         }
-        char * name = malloc(sizeof(char) * (MAX_STRING_LENGTH + 1));
+        char * name = malloc(sizeof(char) * (MAX_NAME_LENGTH+ 1));
+        if (strlen(line) - 5 > MAX_NAME_LENGTH) {
+          printf("Category name on line %lu is longer than maximum length of %i.\n", state->lineNumber, MAX_NAME_LENGTH);
+          return false;
+        }
         strcpy(name, &line[4]);
         name[strlen(name) - 1] = '\0';
         onCategory(catcher, name);
@@ -61,7 +66,7 @@ bool stepParser(ParserState * state, char * line, void * catcher,
         case 1:
             return readInt(state->lineNumber, &state->parsedRecord->instances, line);
         case 2:
-            return readString(state->lineNumber, MAX_STRING_LENGTH, state->parsedRecord->name, line);
+            return readString(state->lineNumber, MAX_NAME_LENGTH, state->parsedRecord->name, line);
         case 3:
             return readInt(state->lineNumber, &state->parsedRecord->price, line);
         default: {
@@ -106,7 +111,7 @@ bool readCatalogFile(
 }
 
 void randomRecord_(ProductRecord * record, CategoryCode categoryCount) {
-    randomWord(record->name);
+    randomName(record->name);
     randomWordFixed(PRODUCT_ID_LENGTH, record->id);
     record->category = randomIntRange(0, categoryCount);
     record->price = randomIntRange(0, 10000);
@@ -119,7 +124,7 @@ bool readRandomCatalog(
     bool (* onReadRecord)(void *, ProductRecord *)) {
     for(size_t i = 0; i < categoryCount; ++i) {
         char * name = malloc(sizeof(char) * MAX_STRING_LENGTH);
-        randomWord(name);
+        randomName(name);
         onReadCategory(catcher, name);
     }
     for(size_t i = 0; i < recordCount; ++i) {
