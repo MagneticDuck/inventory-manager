@@ -158,21 +158,41 @@ start:
         helper.config = config;
         helper.currentEntry = entry;
         helper.currentIndex = index;
-        InteractResult result = interactVirtual((void *) &helper, curses, &displayProducts, catRecordCount(catalog, config), state);
+        InteractResult result = interactVirtual(
+                (void *) &helper, curses, &displayProducts, 
+                catRecordCount(catalog, config), state);
         state = result.state;
         if (result.isQuit) return;
-        if (result.hasCommand) continue; // TODO: seeking and so on
-        else {
-          entry = catSeekBy(config, helper.currentEntry, (int) result.option - (int) helper.currentIndex); 
-          if (serveProductEntry(catalog, curses, entry)) {
-              // jump off and delete
-              ProductEntry * dangling = entry;
-              if (catNext(config, entry)) entry = catNext(config, entry);
-              else if (catPrev(config, entry)) entry = catPrev(config, entry);
-              else entry = NULL;
-              catRemove(catalog, dangling);
-          }
-          goto start;
+        if (result.hasCommand) {
+            // Try to search.
+            ProductEntry * supremum = NULL;
+            if (config->orderAlphabetical 
+                && (supremum = catAlphabeticalSupremum(catalog, config, 
+                    result.command))) {
+                entry = supremum;
+                goto start;
+            } else {
+              Price price = 0;
+              if (sscanf(result.command, "%i", &price) == 1 
+                  && (supremum = catPriceSupremum(catalog, config, price))) {
+                  entry = supremum; 
+                  goto start;
+              } 
+            }
+        } else {
+            // Open product details.
+            entry = catSeekBy(config, helper.currentEntry, 
+                (int) result.option - (int) helper.currentIndex); 
+            if (serveProductEntry(catalog, curses, entry)) {
+                // User requested to delete product.
+                ProductEntry * dangling = entry;
+                if (catNext(config, entry)) entry = catNext(config, entry);
+                else if (catPrev(config, entry)) 
+                  entry = catPrev(config, entry);
+                else entry = NULL;
+                catRemove(catalog, dangling);
+            }
+            goto start;
         }
     }
 }
@@ -182,15 +202,18 @@ start:
 void serveMain(Catalog * catalog, CursesState * curses) {
     ScrollState state = initialScrollState();
     loop {
-        char menu[6][MAX_STRING_LENGTH] = 
-          {"Ver / Editar Produtos",           // 0
+#define MENU_SIZE 7
+        char menu[MENU_SIZE][MAX_STRING_LENGTH] = 
+          {"Listar e Editar Produtos",        // 0
            "Consultar Valores Totais",        // 1
            "Introduzir um Novo Produto",      // 2
-           "Guardar",                         // 3
-           "Guardar e Sair",                  // 4
-           "Sair sem Guardar"                 // 5
+           "Prequisar por ID",                // 3
+           "Guardar",                         // 4
+           "Guardar e Sair",                  // 5
+           "Sair sem Guardar"                 // 6
           };
-        InteractResult result = interact(curses, menu, 6, state);
+        InteractResult result = interact(curses, menu, MENU_SIZE, state);
+#undef MENU_SIZE
         state = result.state;
         if (result.hasCommand || result.isQuit) continue;
         switch(result.option) {
@@ -203,13 +226,19 @@ void serveMain(Catalog * catalog, CursesState * curses) {
         case 2:
             serveAddProduct(catalog, curses);
             break;
-        case 3:
-            writeCatalog(catalog, "data/user.txt");
+        case 3: {
+            if (!result.hasCommand) break;
+            ProductEntry * lookup = catLookupProduct(catalog, result.command);
+            if (lookup) serveListing(catalog, curses, NULL_CONFIG(), lookup);
             break;
+        }
         case 4:
             writeCatalog(catalog, "data/user.txt");
-            return;
+            break;
         case 5:
+            writeCatalog(catalog, "data/user.txt");
+            return;
+        case 6:
             return;
         }
     }
