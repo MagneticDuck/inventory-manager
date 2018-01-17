@@ -30,7 +30,7 @@ void writeCatalog(Catalog * catalog, char * filepath);
 
 // Basic queries.
 
-void ppRecord(Catalog *catalog, ProductEntry *entry);
+void ppRecord(char * string, Catalog * catalog, ProductEntry * entry);
 
 size_t catRecordCount(Catalog *);
 CategoryCode catCategoryCount(Catalog *);
@@ -56,9 +56,9 @@ ListingConfig * NULL_CONFIG(void);
 
 ProductEntry * catFirst(Catalog *, ListingConfig *);
 ProductEntry * catLast(Catalog *, ListingConfig *);
-ProductEntry * catNext(Catalog *, ListingConfig *, ProductEntry *);
-ProductEntry * catSeekBy(Catalog *, ListingConfig *, ProductEntry *, int seeking);
-ProductEntry * catPrev(Catalog *, ListingConfig *, ProductEntry *);
+ProductEntry * catNext(ListingConfig *, ProductEntry *);
+ProductEntry * catPrev(ListingConfig *, ProductEntry *);
+ProductEntry * catSeekBy(ListingConfig *, ProductEntry *, int seeking);
 
 ProductEntry * catAlphabeticalSupremum(Catalog *, ListingConfig * config, char * prefix);
 ProductEntry * catPriceSupremum(Catalog *, ListingConfig * config, Price price);

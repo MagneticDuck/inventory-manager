@@ -1,5 +1,5 @@
 #include "interact.h"
-#include <curses.h>
+#include "curses.h"
 
 #define HEIGHT 20
 #define WIDTH 60
@@ -13,8 +13,8 @@ ScrollState initialScrollState(void) {
 
 typedef struct CursesState {
     WINDOW * win;
-    int lines, cols;
-    int startX, startY;
+    size_t lines, cols;
+    size_t startX, startY;
     char commandBuffer[MAX_STRING_LENGTH];
 } CursesState;
 
@@ -28,7 +28,9 @@ CursesState * openCurses(void) {
     state->cols = COLS - 2;
     refresh();
     state->win = newwin(state->lines + 2, state->cols + 2, state->startX, state->startY);
+    raw();
     noecho();
+    cbreak();
     keypad(state->win, TRUE);
     curs_set(0);
     return state;
@@ -38,14 +40,14 @@ void closeCurses(CursesState * state) {
     delwin(state->win);
     endwin();
     free(state);
+    nocbreak();
 }
-
 
 void getDisplayLine(
     void * userData, CursesState * state,
     void (*getLine)(void *, size_t, char *),
-    size_t lineCount, size_t line, char * lineBuffer) {
-    if(line < 0 || line > lineCount - 1) {
+    size_t lineCount, int line, char * lineBuffer) {
+    if(line < 0 || line > (int) lineCount - 1) {
         fillString(lineBuffer, "", state->cols);
         return;
     }
@@ -58,8 +60,8 @@ void getDisplayLine(
 void scrollScreen(CursesState * curses, ScrollState * state, size_t lineCount, int delta) {
     int target = imin(lineCount - 1, imax(0, state->scroll + state->cursor + delta));
     delta = target - (state->cursor + state->scroll);
-    if(delta + state->cursor > curses->cols - 1) state->cursor = curses->cols - 1;
-    else if(delta + state->cursor < 0) state->cursor = 0;
+    if(delta + (int) state->cursor > (int) curses->lines - 1) state->cursor = curses->lines - 1;
+    else if(delta + (int) state->cursor < 0) state->cursor = 0;
     else state->cursor = target - state->scroll;
     state->scroll = target - state->cursor;
 }
@@ -73,6 +75,10 @@ InteractResult interactVirtual(void * userData,
     loop {
         // Draw everything.
         // box(state->win, 0, 0);
+        if (state.scroll > 0) mvwprintw(curses->win, 0, 0, "^");
+        else mvwprintw(curses->win, 0, 0, " ");
+        if (state.scroll + curses->lines < lineCount) mvwprintw(curses->win, curses->lines + 1, 0, "v");
+        else mvwprintw(curses->win, curses->lines + 1, 0, " ");
         for(size_t line = 0; line < curses->lines; line++) {
             if(line == state.cursor)
                 wattron(curses->win, A_STANDOUT);
@@ -80,8 +86,8 @@ InteractResult interactVirtual(void * userData,
                 wattroff(curses->win, A_STANDOUT);
 
             char lineBuffer[curses->cols + 1];
-            getDisplayLine(userData, curses, getLine, lineCount, line + scroll, lineBuffer);
-            mvwprintw(curses->win, line + 1, 1, "%s", lineBuffer);
+            getDisplayLine(userData, curses, getLine, lineCount, (int) line + state.scroll, lineBuffer);
+            mvwaddstr(curses->win, line + 1, 1, lineBuffer);
             wattroff(curses->win, A_STANDOUT);
         }
         if(commandMode) {
@@ -99,24 +105,30 @@ InteractResult interactVirtual(void * userData,
         InteractResult result;
         int ch = wgetch(curses->win);
         if(commandMode) {
-            if(ch == KEY_BACKSPACE && commandLength > 0) --commandLength;
-            if(ch == ' ' || ('a' <= ch && 'z' >= ch)) curses->commandBuffer[commandLength++] = ch;
-            if(ch == 27) {
-                commandMode = false;
-                commandLength = 0;
-            }
             if(ch == '\n') {
                 InteractResult result;
                 result.hasCommand = true;
-                result.command = &curses->commandBuffer;
+                result.command = curses->commandBuffer;
                 result.state = state;
                 result.option = state.cursor + state.scroll;
                 return result;
+            }
+            if(ch == KEY_BACKSPACE && commandLength > 0) --commandLength;
+            if(ch == ' ' || ('0' <= ch && '9' <= ch) || ('a' <= ch && 'z' >= ch)) curses->commandBuffer[commandLength++] = ch;
+            if(ch == 27) {
+                commandMode = false;
+                commandLength = 0;
             }
             curses->commandBuffer[commandLength] = '\0';
             continue;
         }
         switch(ch) {
+        case 'q':
+            result.hasCommand = false;
+            result.state = state;
+            result.option = state.scroll + state.cursor;
+            result.isQuit = true;
+            return result;
         case '\n':
             result.hasCommand = false;
             result.state = state;
@@ -125,6 +137,7 @@ InteractResult interactVirtual(void * userData,
         case '/':
             commandMode = true;
             commandLength = 0;
+            curses->commandBuffer[0] = '\0';
             break;
         case KEY_UP:
             scrollScreen(curses, &state, lineCount, -1);
@@ -133,10 +146,10 @@ InteractResult interactVirtual(void * userData,
             scrollScreen(curses, &state, lineCount, 1);
             break;
         case KEY_NPAGE:
-            scrollScreen(curses, &state, lineCount, curses->cols - 1);
+            scrollScreen(curses, &state, lineCount, curses->lines- 1);
             break;
         case KEY_PPAGE:
-            scrollScreen(curses, &state, lineCount, 1 - curses->cols);
+            scrollScreen(curses, &state, lineCount, 1 - curses->lines);
             break;
         case KEY_HOME:
             state = initialScrollState();

@@ -14,6 +14,7 @@ ScrollState initialScrollState(void);
 typedef struct {
     ScrollState state;
     size_t option;
+    bool isQuit;
     bool hasCommand;
     char * command;
 } InteractResult;

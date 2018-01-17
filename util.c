@@ -47,7 +47,7 @@ bool priceCompare(void * ptrA, void * ptrB) {
 }
 
 void initRandomSeed() {
-    srand(time(NULL));
+    // srand(time(NULL));
 }
 
 int randomIntRange(int low, int high) {
@@ -68,16 +68,15 @@ bool numericCompare(void * dataA, void * dataB) {
     return (int *) dataA <= (int *) dataB;
 }
 
-void getRandomName(char name[]) {
-
-}
-
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic push
 void fillString(char * dest, char * src, size_t length) {
     bool overflowing = false;
     for(size_t i = 0; i < length; ++i) {
+      dest[i] = '_';
         overflowing = overflowing || src[i] == '\0';
         if(!overflowing) dest[i] = src[i];
-        else dest[i] = ' ';
+        else dest[i] = '_';
     }
     dest[length] = '\0';
 }

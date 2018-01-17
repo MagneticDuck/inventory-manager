@@ -3,6 +3,8 @@ obj/
 bin/
 *.swp
 *.swo
+*.o
+prog
 great-project
 great-project.exe
 great-project.depend

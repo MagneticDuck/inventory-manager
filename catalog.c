@@ -127,12 +127,12 @@ void newCatalogRandom(Catalog ** catalog, size_t categoryCount, size_t recordCou
 
 void freeCatalog(Catalog * catalog) {
     freeDictionary(catalog->productsById);
-    for(size_t i = 0; i <= catCategoryCount(catalog); ++i) {
+    for(CategoryCode i = 0; i <= catCategoryCount(catalog); ++i) {
         freeOrderedList(catalog->productsByName[i]);
         freeOrderedList(catalog->productsByPrice[i]);
     }
     if(catalog->categoriesByValue) freeOrderedList(catalog->categoriesByValue);
-    for(size_t i = 0; i < catCategoryCount(catalog); ++i)
+    for(CategoryCode i = 0; i < catCategoryCount(catalog); ++i)
         freeCategoryEntry_(arrayAccess(catalog->categoriesByCode, i));
     freeArray(catalog->categoriesByCode);
     free(catalog);
@@ -140,7 +140,7 @@ void freeCatalog(Catalog * catalog) {
 
 typedef struct {
     Catalog * catalog;
-    size_t categoryIndex;
+    CategoryCode categoryIndex;
     ProductEntry * head;
 } CatalogIterator;
 
@@ -155,7 +155,7 @@ bool popRecord_(void * ptr, ProductRecord ** record) {
     CatalogIterator * iterator = (CatalogIterator *) ptr;
     if(!iterator->head) return false;
     *record = catProductRecord(iterator->head);
-    iterator->head = catNext(iterator->catalog, NULL_CONFIG(), iterator->head);
+    iterator->head = catNext(NULL_CONFIG(), iterator->head);
     return true;
 }
 
@@ -167,11 +167,12 @@ void writeCatalog(Catalog * catalog, char * filepath) {
     writeFile(filepath, (void *) &iterator, &popCategory_, &popRecord_);
 }
 
-void ppRecord(Catalog* catalog, ProductEntry* entry) {
+void ppRecord(char * string, Catalog * catalog, ProductEntry * entry) {
     ProductRecord * record = catProductRecord(entry);
-    printf("%s | %-50s | %-20s | %-3i | %-3i\n", record->id, record->name,
-           catCategoryName(catalog, record->category),
-           record->price, record->instances);
+    sprintf(string, "%s | %-50s | %-20s | %-3i | %-3i\n", 
+            record->id, record->name,
+            catCategoryName(catalog, record->category),
+            record->price, record->instances);
 }
 
 size_t catRecordCount(Catalog * catalog) {
@@ -206,7 +207,7 @@ ProductRecord * catProductRecord(ProductEntry * product) {
 
 void catRemove(Catalog * catalog, ProductEntry * entry) {
     dictRemove(catalog->productsById, entry->byId);
-    for(size_t i = 0; i <= catCategoryCount(catalog); ++i) {
+    for(CategoryCode i = 0; i <= catCategoryCount(catalog); ++i) {
         olRemove(catalog->productsByName[i], entry->byName[i]);
         olRemove(catalog->productsByPrice[i], entry->byPrice[i]);
     }
@@ -236,16 +237,16 @@ ProductEntry * catLast(Catalog * catalog, ListingConfig * config) {
     return (ProductEntry *) olValue(olLast(getRelevantList_(catalog, config)));
 }
 
-ProductEntry * catNext(Catalog * catalog, ListingConfig * config, ProductEntry * entry) {
+ProductEntry * catNext(ListingConfig * config, ProductEntry * entry) {
     return (ProductEntry *) olValue(olNext(getRelevantNode_(entry, config)));
 }
 
-ProductEntry * catSeekBy(Catalog * catalog, ListingConfig * config, ProductEntry * entry, int seeking) {
-    return (ProductEntry *) olValue(olSeekBy(getRelevantNode_(entry, config), seeking));
+ProductEntry * catPrev(ListingConfig * config, ProductEntry * entry) {
+    return (ProductEntry *) olValue(olPrev(getRelevantNode_(entry, config)));
 }
 
-ProductEntry * catPrev(Catalog * catalog, ListingConfig * config, ProductEntry * entry) {
-    return (ProductEntry *) olValue(olPrev(getRelevantNode_(entry, config)));
+ProductEntry * catSeekBy(ListingConfig * config, ProductEntry * entry, int seeking) {
+    return (ProductEntry *) olValue(olSeekBy(getRelevantNode_(entry, config), seeking));
 }
 
 ProductEntry * catAlphabeticalSupremum(Catalog * catalog, ListingConfig * config, char * prefix) {
@@ -260,8 +261,4 @@ ProductEntry * catPriceSupremum(Catalog * catalog, ListingConfig * config, Price
     if(!config->useFilter) relevant = catalog->productsByPrice[0];
     else relevant = catalog->productsByPrice[config->categoryFilter + 1];
     return (ProductEntry *) olValue(olSupremum(relevant, (void *) &price));
-}
-
-ProductEntry * catLookup(Catalog * catalog, ListingConfig * config, ProductId id) {
-    return (ProductEntry *) dictValue(dictLookup(catalog->productsById, id));
 }
