@@ -2,6 +2,8 @@
 1516176860 source:c:\users\josé\desktop\programacao ii\jdcg\array.c
 	"array.h"
 
+1516208749 
+
 1516176860 c:\users\josé\desktop\programacao ii\jdcg\array.h
 	"util.h"
 
@@ -25,6 +27,8 @@
 	"util.h"
 	"dictionary.h"
 	"ordered_list.h"
+
+1516176860 ist.h"
 
 1516176860 c:\users\josé\desktop\programacao ii\jdcg\data.h
 	<stdio.h>
@@ -59,6 +63,8 @@
 	"util.h"
 	"interact.h"
 
+1516210869 h"
+
 1516176860 source:c:\users\josé\desktop\programacao ii\jdcg\ordered_list.c
 	"util.h"
 	"ordered_list.h"
@@ -75,4 +81,75 @@
 1516207107 source:c:\users\josé\desktop\programacao ii\jdcg\test_code.c
 	<curses.h>
 	<stdbool.h>
+
+1516207107 >
+
+1516176860 source:/home/magneticduck/git/great-project/array.c
+	"array.h"
+
+1516176860 /home/magneticduck/git/great-project/array.h
+	"util.h"
+
+1516206081 /home/magneticduck/git/great-project/util.h
+	<stdio.h>
+	<stddef.h>
+	<stdlib.h>
+	<string.h>
+	<curses.h>
+
+1516176860 source:/home/magneticduck/git/great-project/catalog.c
+	"array.h"
+	"catalog.h"
+	"dictionary.h"
+	"ordered_list.h"
+	"data.h"
+
+1516176860 /home/magneticduck/git/great-project/catalog.h
+	<stdio.h>
+	"data.h"
+	"util.h"
+	"dictionary.h"
+	"ordered_list.h"
+
+1516176860 /home/magneticduck/git/great-project/data.h
+	<stdio.h>
+	"util.h"
+
+1516211355 /home/magneticduck/git/great-project/dictionary.h
+	"util.h"
+
+1516176860 /home/magneticduck/git/great-project/ordered_list.h
+	"util.h"
+
+1516209141 source:/home/magneticduck/git/great-project/data.c
+	"data.h"
+	"util.h"
+
+1516211264 source:/home/magneticduck/git/great-project/dictionary.c
+	"dictionary.h"
+	"ordered_list.h"
+
+1516208749 source:/home/magneticduck/git/great-project/interact.c
+	"interact.h"
+	"curses.h"
+
+1516176860 /home/magneticduck/git/great-project/interact.h
+	"util.h"
+	"data.h"
+
+1516176860 source:/home/magneticduck/git/great-project/ordered_list.c
+	"util.h"
+	"ordered_list.h"
+
+1516208770 source:/home/magneticduck/git/great-project/util.c
+	"util.h"
+	"data.h"
+	<time.h>
+
+1516212367 source:/home/magneticduck/git/great-project/main.c
+	<stdio.h>
+	<stdlib.h>
+	"catalog.h"
+	"util.h"
+	"interact.h"
 

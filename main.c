@@ -84,7 +84,7 @@ void tryEditRecordDetail(Catalog * catalog, ProductRecord * record, size_t optio
     }
     case 4: {
         size_t instances;
-        if (sscanf(command, "%i", &instances) == 1) record->instances = instances;
+        if (sscanf(command, "%lu", &instances) == 1) record->instances = instances;
         break;
     }
     }

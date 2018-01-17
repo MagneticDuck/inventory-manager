@@ -117,7 +117,7 @@ InteractResult interactVirtual(void * userData,
 #ifdef WINDOWS_IS_GREAT
             if(ch == '\r') {
 #else
-            if(ch == '\n')
+            if(ch == '\n') {
 #endif
                 InteractResult result;
                 result.hasCommand = true;

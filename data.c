@@ -11,20 +11,13 @@ typedef struct {
 
 bool readString(size_t lineNumber, size_t maxLength, char * dest, char * line) {
     size_t length = strlen(line);
-#ifdef WINDOWS_IS_GREAT    if (length - 1 > maxLength) {
-#else
+ // MICROSOFT NEWLINES!! on windows we need to cut off two characters from the end
     if (length - 1 > maxLength) {
-#endif
         printf("String on line %lui is longer than maximum length of %lu.\n", lineNumber, maxLength);
         return false;
     }
-#ifdef WINDOWS_IS_GREAT
     memcpy(dest, line, length - 1);
     line[length - 1] = '\0';
-#else
-    memcpy(dest, line, length - 1);
-    line[length - 1] = '\0';
-#endif
     return true;
 }
 
@@ -188,3 +181,4 @@ bool writeFile(
     fclose(file);
     return true;
 }
+
