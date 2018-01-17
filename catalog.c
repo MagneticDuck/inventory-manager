@@ -243,6 +243,10 @@ void catRegisterRecordEdits(Catalog * catalog, ProductEntry * entry) {
     // TODO: reindex in ordered lists
 }
 
+void catUndoRecordEdits(ProductEntry * entry) {
+  copyRecord(entry->record, entry->syncedRecord);
+}
+
 void catRemove(Catalog * catalog, ProductEntry * entry) {
     dictRemove(catalog->productsById, entry->byId);
     for(CategoryCode i = 0; i <= catCategoryCount(catalog); ++i) {

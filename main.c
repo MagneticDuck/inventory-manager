@@ -93,8 +93,10 @@ typedef struct {
 
 void displayProductEntryInterface(void * ptr, size_t line, char * buffer) {
     ProductEntryHelper * helper = (ProductEntryHelper *) ptr;
-    if (line == 5) sprintf(buffer, "Remover Produto (NAO REVERSIVEL)");
     if (line < 5) displayRecordDetail(helper->catalog, catProductRecord(helper->entry), line, buffer);
+    if (line == 5) sprintf(buffer, "Efetua Alteracoes");
+    if (line == 6) sprintf(buffer, "Cancela Alteracoes (q)");
+    if (line == 7) sprintf(buffer, "Remover Produto (NAO REVERSIVEL)");
 }
 
 void serveProductEntry(Catalog * catalog, CursesState * curses, ProductEntry * entry) {
@@ -104,18 +106,25 @@ void serveProductEntry(Catalog * catalog, CursesState * curses, ProductEntry * e
     ScrollState state = initialScrollState(); 
     loop {
         InteractResult result = interactVirtual((void *) &helper, curses,
-            &displayProductEntryInterface, 6, state);
+            &displayProductEntryInterface, 8, state);
         state = result.state;
         if (result.hasCommand && result.option < 5) {
           tryEditRecordDetail(catalog, catProductRecord(entry), result.option, result.command, true);
-          catRegisterRecordEdits(catalog, entry);
           continue;
         }
-        /* TODO: deleting products
-        if (!result.hasCommand && result.option == 5) {
+        if (result.option == 5)  {
+          catRegisterRecordEdits(catalog, entry);
+          return;
+        }
+        if (result.isQuit || result.option == 6)  {
+          catUndoRecordEdits(entry);
+          return;
+        }
+        /*
+        if (!result.hasCommand && result.option == 7) {
+          TODO (maybe return a value for serveListing to consider)
         }
         */
-        if (result.isQuit) return;
     }
 }
 
@@ -136,6 +145,12 @@ void displayProducts(void * ptr, size_t line, char * buffer) {
 
 void serveListing(Catalog * catalog, CursesState * curses, 
       ListingConfig * config, ProductEntry * entry) {
+    if (!entry) {
+        loop {
+            InteractResult result = interact(curses, NULL, 0, initialScrollState());
+            if (result.isQuit) return;
+        }
+    }
     size_t index = catIndex(config, entry);
     ScrollState state = startScrollAt(curses, index, catRecordCount(catalog, config));
     loop {
@@ -161,7 +176,7 @@ void serveMain(Catalog * catalog, CursesState * curses) {
           {"Ver / Editar Produtos",           // 0
            "Consultar Valores Totais",        // 1
            "Introduzir um Novo Produto",      // 2
-           "Guardar", // 3
+           "Guardar",                         // 3
            "Guardar e Sair",                  // 4
            "Sair sem Guardar"                 // 5
           };
@@ -214,7 +229,7 @@ void serveSelectListing(Catalog * catalog, CursesState * curses) {
             break;
         }
 
-        char sortMenu[2][MAX_STRING_LENGTH] = {"Ordenar alfabeticamente", "Ordenar por precos"};
+        char sortMenu[2][MAX_STRING_LENGTH] = {"Ordenar Alfabeticamente", "Ordenar por Precos"};
         InteractResult result = interact(curses, sortMenu, 2, initialScrollState());
         if(result.isQuit) continue;
         config.orderAlphabetical = result.option == 0;
@@ -256,6 +271,11 @@ void displayAddProductInterface(void * ptr, size_t line, char * buffer) {
     if (line == 6) sprintf(buffer, "Cancelar Operacao");
 }
 
+void displayCategories(void * ptr, size_t line, char * buffer) {
+    Catalog *catalog = (Catalog *) ptr;
+    strcpy(buffer, catCategoryName(catalog, line));
+}
+
 void serveAddProduct(Catalog * catalog, CursesState * curses) {
   ScrollState state = initialScrollState();
   AddProductHelper helper;
@@ -270,6 +290,10 @@ void serveAddProduct(Catalog * catalog, CursesState * curses) {
     InteractResult result = interactVirtual((void *) &helper, curses, &displayAddProductInterface, 7, state);
     state = result.state;
     if (result.command && result.option < 5) tryEditRecordDetail(catalog, &helper.record, result.option, result.command, false);
+    if (!result.command && result.option == 3) {
+        InteractResult result = interactVirtual((void *) catalog, curses, &displayCategories, catCategoryCount(catalog), initialScrollState());
+        if (!result.isQuit) helper.record.category = result.option;
+    }
     if (result.option == 6 || result.isQuit) return;
     if (result.option == 5) {
       ProductEntry * entry = catAddRecord(catalog, &helper.record);

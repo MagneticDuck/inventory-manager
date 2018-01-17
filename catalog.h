@@ -39,6 +39,7 @@ ProductEntry * catLookupProduct(Catalog * catalog, ProductId id);
 ProductRecord * catProductRecord(ProductEntry * product);
 ProductEntry * catAddRecord(Catalog * catalog, ProductRecord * record); // copies data
 void catRegisterRecordEdits(Catalog * catalog, ProductEntry * entry); // register edits made to the record
+void catUndoRecordEdits(ProductEntry * entry);
 void catRemove(Catalog *, ProductEntry *);
 
 // Listing the products.
