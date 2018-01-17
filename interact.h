@@ -12,6 +12,7 @@ typedef struct {
     size_t scroll, cursor;
 } ScrollState;
 
+ScrollState startScrollAt(CursesState *, size_t line, size_t lineCount);
 ScrollState initialScrollState(void);
 
 typedef struct {

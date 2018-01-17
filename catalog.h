@@ -33,10 +33,12 @@ Price catCategoryValue(Catalog *, CategoryCode);
 CategoryCode catCategoryByRank(Catalog *, size_t place);
 
 // Accessing and modifying records.
+// Only the name, price and instances fields of ProductRecord may be changed.
 
 ProductEntry * catLookupProduct(Catalog * catalog, ProductId id);
 ProductRecord * catProductRecord(ProductEntry * product);
 ProductEntry * catAddRecord(Catalog * catalog, ProductRecord * record); // copies data
+void catRegisterRecordEdits(Catalog * catalog, ProductEntry * entry); // register edits made to the record
 void catRemove(Catalog *, ProductEntry *);
 
 // Listing the products.
@@ -50,6 +52,7 @@ typedef struct {
 ListingConfig * NULL_CONFIG(void);
 
 size_t catRecordCount(Catalog *, ListingConfig * config);
+size_t catIndex(ListingConfig *, ProductEntry *);
 ProductEntry * catFirst(Catalog *, ListingConfig *);
 ProductEntry * catLast(Catalog *, ListingConfig *);
 ProductEntry * catNext(ListingConfig *, ProductEntry *);

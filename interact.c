@@ -4,6 +4,23 @@
 #define HEIGHT 20
 #define WIDTH 60
 
+typedef struct CursesState {
+    WINDOW * win;
+    size_t lines, cols;
+    size_t startX, startY;
+    char commandBuffer[MAX_STRING_LENGTH];
+} CursesState;
+
+void scrollScreen(CursesState * curses, ScrollState * state, size_t lineCount, int delta) {
+    if (lineCount == 0) return;
+    int target = imin(lineCount - 1, imax(0, state->scroll + state->cursor + delta));
+    delta = target - (state->cursor + state->scroll);
+    if(delta + (int) state->cursor > (int) curses->lines - 1) state->cursor = curses->lines - 1;
+    else if(delta + (int) state->cursor < 0) state->cursor = 0;
+    else state->cursor = target - state->scroll;
+    state->scroll = target - state->cursor;
+}
+
 ScrollState initialScrollState(void) {
     ScrollState state;
     state.scroll = 0;
@@ -11,12 +28,12 @@ ScrollState initialScrollState(void) {
     return state;
 }
 
-typedef struct CursesState {
-    WINDOW * win;
-    size_t lines, cols;
-    size_t startX, startY;
-    char commandBuffer[MAX_STRING_LENGTH];
-} CursesState;
+ScrollState startScrollAt(CursesState * curses, 
+      size_t line, size_t lineCount) {
+    ScrollState state = initialScrollState();
+    scrollScreen(curses, &state, lineCount, line);
+    return state;
+}
 
 CursesState * openCurses(void) {
     CursesState * state = malloc(sizeof(CursesState));
@@ -59,16 +76,6 @@ void getDisplayLine(
     char userLine[MAX_STRING_LENGTH + 1];
     getLine(userData, line, userLine);
     fillString(lineBuffer, userLine, state->cols);
-}
-
-void scrollScreen(CursesState * curses, ScrollState * state, size_t lineCount, int delta) {
-    if (lineCount == 0) return;
-    int target = imin(lineCount - 1, imax(0, state->scroll + state->cursor + delta));
-    delta = target - (state->cursor + state->scroll);
-    if(delta + (int) state->cursor > (int) curses->lines - 1) state->cursor = curses->lines - 1;
-    else if(delta + (int) state->cursor < 0) state->cursor = 0;
-    else state->cursor = target - state->scroll;
-    state->scroll = target - state->cursor;
 }
 
 InteractResult interactVirtual(void * userData,
@@ -129,12 +136,14 @@ InteractResult interactVirtual(void * userData,
             continue;
         }
         switch(ch) {
+        case KEY_LEFT:
         case 'q':
             result.hasCommand = false;
             result.state = state;
             result.option = state.scroll + state.cursor;
             result.isQuit = true;
             return result;
+        case KEY_RIGHT:
         case '\n':
             result.hasCommand = false;
             result.state = state;

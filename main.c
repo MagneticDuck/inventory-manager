@@ -95,9 +95,10 @@ void serveProductEntry(Catalog * catalog, CursesState * curses, ProductEntry * e
     loop {
         InteractResult result = interactVirtual((void *) &helper, curses,
             &displayProductEntryInterface, 6, state);
+        state = result.state;
         if (result.hasCommand && result.option < 5) {
           tryEditRecordDetail(catalog, catProductRecord(entry), result.option, result.command);
-          // catReindexEntry(entry);
+          catRegisterRecordEdits(catalog, entry);
           continue;
         }
         /* TODO: deleting products
@@ -125,13 +126,14 @@ void displayProducts(void * ptr, size_t line, char * buffer) {
 
 void serveListing(Catalog * catalog, CursesState * curses, 
       ListingConfig * config, ProductEntry * entry) {
-    ScrollState state = initialScrollState();
+    size_t index = catIndex(config, entry);
+    ScrollState state = startScrollAt(curses, index, catRecordCount(catalog, config));
     loop {
         ListingHelper helper;
         helper.catalog = catalog;
         helper.config = config;
         helper.currentEntry = entry;
-        helper.currentIndex = 0;
+        helper.currentIndex = index;
         InteractResult result = interactVirtual((void *) &helper, curses, &displayProducts, catRecordCount(catalog, config), state);
         state = result.state;
         if (result.isQuit) return;
@@ -260,7 +262,7 @@ void serveAddProduct(Catalog * catalog, CursesState * curses) {
   loop {
     InteractResult result = interactVirtual((void *) &helper, curses, &displayAddProductInterface, 7, state);
     state = result.state;
-    if (result.option < 5) tryEditRecordDetail(catalog, &helper.record, result.option, result.command);
+    if (result.command && result.option < 5) tryEditRecordDetail(catalog, &helper.record, result.option, result.command);
     if (result.option == 6 || result.isQuit) return;
     if (result.option == 5) {
       ProductEntry * entry = catAddRecord(catalog, &helper.record);

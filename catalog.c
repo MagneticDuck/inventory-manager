@@ -5,11 +5,19 @@
 #include "data.h"
 
 typedef struct ProductEntry {
-    ProductRecord * record;
+    ProductRecord * record, * syncedRecord;
     DictEntry * byId;
     OLNode * byName[2];
     OLNode * byPrice[2];
 } ProductEntry;
+
+void copyRecord(ProductRecord * dest, ProductRecord * src) {
+    strcpy(dest->id, src->id);
+    strcpy(dest->name, src->name);
+    dest->price = src->price;
+    dest->category = src->category;
+    dest->instances = src->instances;
+}
 
 ListingConfig * NULL_CONFIG(void) {
     static ListingConfig config; // static!
@@ -83,7 +91,9 @@ bool onReadCategory_(void * ptr, char * name) {
 ProductEntry * catAddRecord_(Catalog * catalog, ProductRecord * record) {
     // Make entry.
     ProductEntry * entry = malloc(sizeof(ProductEntry));
-    entry->record = record;
+    entry->syncedRecord = record;
+    entry->record= malloc(sizeof(ProductRecord));
+    copyRecord(entry->record, entry->syncedRecord);
 
     // Add entry to all the structures.
     entry->byId = dictAdd(catalog->productsById, (void *) record->id, (void *) entry);
@@ -220,12 +230,17 @@ ProductRecord * catProductRecord(ProductEntry * product) {
 
 ProductEntry * catAddRecord(Catalog * catalog, ProductRecord * userRecord) {
     ProductRecord * record = malloc(sizeof(ProductRecord));
-    strcpy(record->id, userRecord->id);
-    strcpy(record->name, userRecord->name);
-    record->price = userRecord->price;
-    record->category = userRecord->category;
-    record->instances = userRecord->instances;
-    return catAddRecord(catalog, record);
+    copyRecord(record, userRecord);
+    return catAddRecord_(catalog, record);
+}
+
+void catRegisterRecordEdits(Catalog * catalog, ProductEntry * entry) {
+    Price priceDelta = (entry->record->price * entry->record->instances) 
+      - (entry->syncedRecord->price * entry->syncedRecord->instances);
+    catalog->netValue += priceDelta;
+    catCategoryEntry_(catalog, entry->record->category)->netValue += priceDelta;
+    copyRecord(entry->syncedRecord, entry->record);
+    // TODO: reindex in ordered lists
 }
 
 void catRemove(Catalog * catalog, ProductEntry * entry) {
@@ -234,6 +249,8 @@ void catRemove(Catalog * catalog, ProductEntry * entry) {
         olRemove(catalog->productsByName[i], entry->byName[i]);
         olRemove(catalog->productsByPrice[i], entry->byPrice[i]);
     }
+    free(entry->record);
+    free(entry->syncedRecord);
 }
 
 OLNode * getRelevantNode_(ProductEntry * entry, ListingConfig * config) {
@@ -254,6 +271,10 @@ OrderedList * getRelevantList_(Catalog * catalog, ListingConfig * config) {
 
 size_t catRecordCount(Catalog * catalog, ListingConfig * config) {
     return olSize(getRelevantList_(catalog, config));
+}
+
+size_t catIndex(ListingConfig * config, ProductEntry * entry) {
+    return olIndex(getRelevantNode_(entry, config));
 }
 
 ProductEntry * catFirst(Catalog * catalog, ListingConfig * config) {
