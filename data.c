@@ -13,11 +13,11 @@ bool readString(size_t lineNumber, size_t maxLength, char * dest, char * line) {
     size_t length = strlen(line);
  // MICROSOFT NEWLINES!! on windows we need to cut off two characters from the end
     if (length - 1 > maxLength) {
-        printf("String on line %lui is longer than maximum length of %lu.\n", lineNumber, maxLength);
+        printf("String on line %lu is longer than maximum length of %lu.\n", lineNumber, maxLength);
         return false;
     }
     memcpy(dest, line, length - 1);
-    line[length - 1] = '\0';
+    dest[length - 1] = '\0';
     return true;
 }
 
@@ -53,10 +53,11 @@ bool stepParser(ParserState * state, char * line, void * catcher,
 
     // Record field definition?
     {
-        if (state->definingCategories == true && state->lineNumber == 1) {
+        if (state->definingCategories && state->lineNumber == 1) {
             printf("At least one category definition is required.\n");
             return false;
         }
+        if (state->definingCategories) state->parsedRecord = NULL;
         state->definingCategories = false;
         if(!state->parsedRecord) {
             state->currentRecordField = 0;
@@ -64,7 +65,7 @@ bool stepParser(ParserState * state, char * line, void * catcher,
         }
 
         switch(state->currentRecordField++) {
-        case 0:
+        case 0: 
             return readString(state->lineNumber, PRODUCT_ID_LENGTH, state->parsedRecord->id, line);
         case 1:
             return readInt(state->lineNumber, &state->parsedRecord->instances, line);
@@ -72,7 +73,7 @@ bool stepParser(ParserState * state, char * line, void * catcher,
             return readString(state->lineNumber, MAX_NAME_LENGTH, state->parsedRecord->name, line);
         case 3:
             return readInt(state->lineNumber, &state->parsedRecord->price, line);
-        default: {
+        case 4: {
             if(!readInt(state->lineNumber, &state->parsedRecord->category, line)) return false;
             onRecord(catcher, state->parsedRecord);
             state->parsedRecord = NULL;
@@ -80,6 +81,9 @@ bool stepParser(ParserState * state, char * line, void * catcher,
         }
         }
     }
+
+    printf("What the fuck.\n");
+    return false;
 }
 
 bool loadFile_(
