@@ -132,8 +132,10 @@ InteractResult interactVirtual(void * userData,
 #else
             if((ch == KEY_LEFT || ch == KEY_BACKSPACE) && commandLength > 0) --commandLength;
 #endif
-            if(ch == ' ' || ('0' <= ch && '9' >= ch) || ('a' <= ch && 'z' >= ch))
+            if(ch == ' ' || ('0' <= ch && '9' >= ch) || ('a' <= ch && 'z' >= ch)) {
+                if ((int) commandLength == imin(curses->cols - 2, MAX_STRING_LENGTH)) continue;
                 curses->commandBuffer[commandLength++] = ch;
+            }
             if(ch == 27) {
                 commandMode = false;
                 commandLength = 0;
