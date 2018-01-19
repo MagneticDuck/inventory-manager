@@ -21,7 +21,7 @@ void serveAddProduct(Catalog *, CursesState *);
 int main(void) {
     initRandomSeed(); // for product IDs
     Catalog * catalog;
-    newCatalogRandom(&catalog, 10, 1000);
+    newCatalogRandom(&catalog, 10, 10000);
     writeCatalog(catalog, "data/random.txt");
     freeCatalog(catalog);
 

@@ -1,0 +1,13 @@
+thing(f) {
+  for a in big_data_structure {
+    do_action(f(a))
+  }
+}
+
+main() {
+  int b = something;
+  thing(a --> a + b)
+  thing(a --> a * b)
+}
+
+// closure

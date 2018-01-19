@@ -1,7 +1,7 @@
 TARGET = prog
 LIBS = -L ~/.nix-profile/lib -lm -lncurses
 CC = gcc
-CFLAGS = -g -Wall -Wextra -Werror -I /nix/store/sxpjs9wdw3i845h4cpswdywqs0p86nn7-ncurses-6.0-dev/include
+CFLAGS = -O3 -Wall -Wextra -Werror -I /nix/store/sxpjs9wdw3i845h4cpswdywqs0p86nn7-ncurses-6.0-dev/include
 
 .PHONY: default all clean
 
